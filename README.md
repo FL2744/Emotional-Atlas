@@ -6,7 +6,7 @@
 
 Emotional Atlas is a native desktop application that uses **OpenAI GPT-6 Luna or a VT ARC model** to infer emotional meaning, identify supporting words and passages, and map paragraphs in an interactive 3D space. It includes text-order animation, PCA views, and resumable analysis sessions in a dark monochrome interface inspired by FENNEC and LAMP, with red-to-blue valence colors reserved for plot points.
 
-[Download macOS v0.5.1](https://github.com/FL2744/emotion-atlas/releases/tag/v0.5.1) · [User guide](docs/USER_GUIDE.md) · [Release notes](CHANGELOG.md)
+[Download macOS v0.5.1](https://github.com/FL2744/Emotional-Atlas/releases/tag/v0.5.1) · [User guide](docs/USER_GUIDE.md) · [Release notes](CHANGELOG.md)
 
 ## Features
 
@@ -23,7 +23,7 @@ Emotional Atlas is a native desktop application that uses **OpenAI GPT-6 Luna or
 
 The v0.5.1 binary targets **Apple Silicon (arm64), macOS 15 or later**. The bundled binaries are checked for a macOS 15.0 or earlier deployment target; the packaged app is smoke-tested on macOS 26.6.2. Intel and other operating systems do not have packaged releases yet.
 
-1. Download `Emotional-Atlas-v0.5.1-macOS-arm64.zip` from the [v0.5.1 release](https://github.com/FL2744/emotion-atlas/releases/tag/v0.5.1).
+1. Download `Emotional-Atlas-v0.5.1-macOS-arm64.zip` from the [v0.5.1 release](https://github.com/FL2744/Emotional-Atlas/releases/tag/v0.5.1).
 2. Extract the ZIP and drag **Emotional Atlas.app** into Applications.
 3. Open the app.
 
@@ -71,8 +71,8 @@ These are model-generated interpretations, not validated psychological measureme
 Requires **Python 3.10+ with Tk**. The application itself uses the Python standard library; no third-party runtime packages are required.
 
 ```bash
-git clone https://github.com/FL2744/emotion-atlas.git
-cd emotion-atlas
+git clone https://github.com/FL2744/Emotional-Atlas.git
+cd Emotional-Atlas
 python3 app.py
 ```
 
