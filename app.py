@@ -12,21 +12,23 @@ from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
 from pca import fit_pca, pca_report
 from playback import Timeline, revealed_rows, consecutive_segments
-from analysis import (MODEL, AnalysisError, Cancelled, analyze_resilient_batch, batches,
+from analysis import (MODEL, ARC_MODEL, AnalysisError, Cancelled, analyze_resilient_batch, batches,
                       export_session, load_session, split_paragraphs, gutenberg_body)
 
 BASE = Path(__file__).resolve().parent
-BG = '#161616'
-PANEL = '#242424'
-TEXT = '#ffffff'
-MUTED = '#bbbbbb'
-POSITIVE_COLOR = '#619bff'
-BLUE = '#dddddd'
-NEGATIVE_COLOR = '#ff6464'
-GOLD = '#dddddd'
-PLOT_BG = '#080808'
-PLOT_TEXT = '#eeeeee'
-PLOT_MUTED = '#aaaaaa'
+# Dark monochrome interface; valence color is reserved for plotted data.
+BG = '#111113'
+PANEL = '#19191c'
+TEXT = '#f2f2f3'
+MUTED = '#aaaab0'
+BLUE = TEXT
+GOLD = TEXT
+RULE = '#3d3d43'
+PLOT_BG = '#19191c'
+PLOT_TEXT = TEXT
+PLOT_MUTED = '#aaaab0'
+PLOT_GRID = '#303035'
+PLOT_EDGE = '#55555d'
 
 
 def color(valence):
@@ -141,22 +143,30 @@ class EmotionPlot(tk.Canvas):
 
     def draw(self):
         self.delete('all')
+        if not self.rows:
+            self.points = []
+            self.create_text(self.winfo_width()/2,self.winfo_height()/2,
+                text='Analyze text or open a session to view the plot.',
+                fill=PLOT_MUTED,font=('Helvetica Neue',12),
+                width=max(100,self.winfo_width()-64),justify='center')
+            if self.on_draw is not None:self.on_draw()
+            return
         if self.mode == 'PCA 2D':
             for tick in (-1,-.5,0,.5,1):
-                self.line3((tick,-1,0),(tick,1,0),'#333333')
-                self.line3((-1,tick,0),(1,tick,0),'#333333')
+                self.line3((tick,-1,0),(tick,1,0),PLOT_GRID)
+                self.line3((-1,tick,0),(1,tick,0),PLOT_GRID)
             self.line3((-1,0,0),(1,0,0),PLOT_MUTED)
             self.line3((0,-1,0),(0,1,0),PLOT_MUTED)
         else:
             for tick in (-1,-.5,0,.5,1):
-                self.line3((tick,-1,-1),(tick,1,-1),'#333333')
-                self.line3((-1,tick,-1),(1,tick,-1),'#333333')
+                self.line3((tick,-1,-1),(tick,1,-1),PLOT_GRID)
+                self.line3((-1,tick,-1),(1,tick,-1),PLOT_GRID)
             for x in (-1,1):
                 for y in (-1,1):
-                    self.line3((x,y,-1),(x,y,1),'#303030',dash=(3,5))
-            self.line3((-1,-1,-1),(1,-1,-1),'#aaaaaa',2)
-            self.line3((-1,-1,-1),(-1,1,-1),'#aaaaaa',2)
-            self.line3((-1,-1,-1),(-1,-1,1),'#aaaaaa',2)
+                    self.line3((x,y,-1),(x,y,1),PLOT_EDGE,dash=(3,5))
+            self.line3((-1,-1,-1),(1,-1,-1),PLOT_MUTED,2)
+            self.line3((-1,-1,-1),(-1,1,-1),PLOT_MUTED,2)
+            self.line3((-1,-1,-1),(-1,-1,1),PLOT_MUTED,2)
         if self.mode == 'Emotion axes':
             self.label3((0,-1.45,-1),'VALENCE  −1 → +1')
             self.label3((-1.45,0,-1),'DIRECTION\ninward −1 / outward +1')
@@ -189,22 +199,17 @@ class EmotionPlot(tk.Canvas):
         if self.mode != 'Emotion axes' and self.pca['error']:
             self.create_text(self.winfo_width()/2,self.winfo_height()/2,text=self.pca['error'],
                              fill=PLOT_TEXT,font=('Menlo',12),width=max(200,self.winfo_width()-80))
-        elif not self.rows:
-            self.create_text(self.winfo_width()/2,self.winfo_height()/2-24,
-                text='Your emotional landscape starts here', fill=PLOT_TEXT,font=('Menlo',17,'bold'))
-            self.create_text(self.winfo_width()/2,self.winfo_height()/2+6,
-                text='Analyze text to map each paragraph in three dimensions.',fill=PLOT_MUTED,font=('Menlo',11))
         self.create_text(18,self.winfo_height()-18,anchor='sw',fill=PLOT_MUTED,
-            text=('Scroll to zoom · Click a point to inspect' if self.mode == 'PCA 2D' else 'Drag to rotate · Scroll to zoom · Click a point to inspect'),font=('Menlo',10))
+            text=('Scroll to zoom · Click a point to inspect' if self.mode == 'PCA 2D' else 'Drag to rotate · Scroll to zoom · Click a point to inspect'),font=('Helvetica Neue',10))
         if self.on_draw is not None:self.on_draw()
 
 
 class Atlas(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title('Emotional Atlas v0.3 · GPT-6 Luna')
+        self.title('Emotional Atlas v0.3')
         self.geometry('1390x920')
-        self.minsize(1030,720)
+        self.minsize(900,600)
         self.configure(background=BG)
         icon_path=BASE/'assets'/'emotion-atlas-icon-small.png'
         if icon_path.exists():
@@ -231,7 +236,11 @@ class Atlas(tk.Tk):
         self.trail=tk.BooleanVar(value=False)
         self.plot_mode=tk.StringVar(value='Emotion axes')
         self.pca_signature=None
-        self.key=tk.StringVar()
+        self.provider=tk.StringVar(value='OpenAI')
+        self.arc_model=tk.StringVar(value=ARC_MODEL)
+        self.api_keys={'openai':tk.StringVar(), 'arc':tk.StringVar()}
+        self.key=self.api_keys['openai']
+        self.session_provider='openai';self.session_model=MODEL
         self.status=tk.StringVar(value='Ready. Add text and your API key to begin.')
         self.stats=tk.StringVar(value='0 paragraphs  /  0 analyzed')
         self.filter=tk.StringVar(value='All paragraphs')
@@ -244,59 +253,97 @@ class Atlas(tk.Tk):
 
     def configure_styles(self):
         style=ttk.Style(self);style.theme_use('clam')
-        style.configure('.',background=BG,foreground=TEXT,font=('Menlo',10),borderwidth=1)
+        style.configure('.',background=BG,foreground=TEXT,font=('Helvetica Neue',11),
+                        borderwidth=1,bordercolor=RULE,lightcolor=RULE,darkcolor=RULE,
+                        focuscolor=TEXT)
         style.configure('TFrame',background=BG)
         style.configure('Panel.TFrame',background=PANEL)
-        style.configure('Card.TFrame',background=PANEL,padding=10,relief='solid',borderwidth=1,bordercolor='#777777')
+        style.configure('Card.TFrame',background=PANEL,padding=10,
+                        relief='solid',borderwidth=1,bordercolor=RULE)
         style.configure('TLabel',background=BG,foreground=TEXT)
-        style.configure('Muted.TLabel',foreground=MUTED,font=('Menlo',10))
-        style.configure('Title.TLabel',font=('Menlo',23,'bold'),foreground=POSITIVE_COLOR)
-        style.configure('Heading.TLabel',font=('Menlo',12,'bold'),foreground='#ffffff')
-        style.configure('TButton',background='#414141',foreground=TEXT,padding=(10,7),borderwidth=2,relief='raised',bordercolor='#999999',lightcolor='#999999',darkcolor='#111111')
-        style.map('TButton',background=[('disabled','#303030'),('pressed','#282828'),('active','#555555')],foreground=[('disabled','#999999'),('active',TEXT)],relief=[('pressed','sunken')])
-        style.configure('Accent.TButton',background='#dddddd',foreground='#111111')
-        style.map('Accent.TButton',background=[('disabled','#303030'),('pressed','#bbbbbb'),('active','#ffffff')],foreground=[('disabled','#999999')])
-        style.configure('TEntry',fieldbackground=PANEL,foreground=TEXT,insertcolor=TEXT,padding=8,borderwidth=2,bordercolor='#999999',lightcolor='#999999',darkcolor='#111111')
-        style.configure('TCombobox',fieldbackground=PANEL,background='#414141',foreground=TEXT,arrowcolor=TEXT,padding=6,borderwidth=2,bordercolor='#999999',lightcolor='#999999',darkcolor='#111111')
-        style.map('TCombobox',fieldbackground=[('readonly',PANEL)],foreground=[('readonly',TEXT)])
+        style.configure('Muted.TLabel',foreground=MUTED,font=('Helvetica Neue',10))
+        style.configure('Title.TLabel',font=('Helvetica Neue',26,'bold'),foreground=TEXT)
+        style.configure('Heading.TLabel',font=('Helvetica Neue',14,'bold'),foreground=TEXT)
+        style.configure('TButton',background=PANEL,foreground=TEXT,padding=(10,7),
+                        borderwidth=1,relief='solid')
+        style.map('TButton',background=[('disabled',BG),('pressed','#3b3b43'),('active','#2d2d33')],
+                  foreground=[('disabled','#75757d'),('pressed',TEXT),('active',TEXT)])
+        style.configure('Accent.TButton',background='#35353d',foreground=TEXT)
+        style.map('Accent.TButton',background=[('disabled','#303035'),('pressed','#484851'),('active','#41414a')],
+                  foreground=[('disabled',MUTED),('!disabled',TEXT)])
+        style.configure('TEntry',fieldbackground=PANEL,foreground=TEXT,insertcolor=TEXT,
+                        padding=8,borderwidth=1)
+        style.configure('TCombobox',fieldbackground=PANEL,background=PANEL,foreground=TEXT,
+                        arrowcolor=TEXT,padding=6,borderwidth=1)
+        style.map('TCombobox',fieldbackground=[('readonly',PANEL)],
+                  foreground=[('disabled',MUTED),('readonly',TEXT)],
+                  background=[('active','#2b2b31')],selectbackground=[('readonly',PANEL)],
+                  selectforeground=[('readonly',TEXT)])
         self.option_add('*TCombobox*Listbox.background',PANEL)
         self.option_add('*TCombobox*Listbox.foreground',TEXT)
-        self.option_add('*TCombobox*Listbox.selectBackground','#dddddd')
-        self.option_add('*TCombobox*Listbox.selectForeground','#111111')
-        style.configure('Treeview',fieldbackground=PANEL,background=PANEL,foreground=TEXT,rowheight=29)
-        style.configure('Treeview.Heading',background='#414141',foreground=TEXT,padding=7,relief='raised')
-        style.map('Treeview',background=[('selected','#dddddd')],foreground=[('selected','#111111')])
-        style.configure('TNotebook',background=BG,borderwidth=1)
-        style.configure('TNotebook.Tab',background='#242424',foreground=MUTED,padding=(14,8))
-        style.map('TNotebook.Tab',background=[('selected','#414141')],foreground=[('selected',TEXT)])
-        style.configure('TCheckbutton',background=BG,foreground=TEXT)
-        style.map('TCheckbutton',background=[('active',BG)])
-        style.configure('TSeparator',background='#777777')
-        style.configure('Horizontal.TProgressbar',background='#dddddd',troughcolor=PANEL)
-        style.configure('Horizontal.TScale',background='#dddddd',troughcolor=PANEL)
+        self.option_add('*TCombobox*Listbox.selectBackground',TEXT)
+        self.option_add('*TCombobox*Listbox.selectForeground',PANEL)
+        style.configure('Treeview',fieldbackground=PANEL,background=PANEL,foreground=TEXT,
+                        rowheight=30,borderwidth=0)
+        style.configure('Treeview.Heading',background=BG,foreground=TEXT,
+                        font=('Menlo',10,'bold'),padding=8,relief='solid')
+        style.map('Treeview.Heading',background=[('active','#2b2b31')])
+        style.map('Treeview',background=[('selected','#3c3c46')],foreground=[('selected',TEXT)])
+        style.configure('TNotebook',background=BG,borderwidth=0)
+        style.configure('TNotebook.Tab',background=BG,foreground=MUTED,padding=(16,9),borderwidth=1)
+        style.map('TNotebook.Tab',background=[('selected','#3c3c46'),('active','#2d2d33')],
+                  foreground=[('selected',TEXT),('active',TEXT)])
+        style.configure('TCheckbutton',background=BG,foreground=TEXT,
+                        indicatorbackground=PANEL,indicatorforeground=TEXT)
+        style.map('TCheckbutton',background=[('active',BG)],
+                  indicatorbackground=[('selected',TEXT)],indicatorforeground=[('selected',PANEL)])
+        style.configure('TSeparator',background=RULE)
+        style.configure('Horizontal.TProgressbar',background=TEXT,troughcolor='#2b2b31',borderwidth=0)
+        style.configure('Horizontal.TScale',background=TEXT,troughcolor='#303035',borderwidth=0)
+        style.configure('TPanedwindow',background=BG)
         style.layout('Modern.Vertical.TScrollbar',[
             ('Vertical.Scrollbar.trough',{'sticky':'ns','children':[
                 ('Vertical.Scrollbar.thumb',{'sticky':'nswe','expand':True})]})])
-        style.configure('Modern.Vertical.TScrollbar',width=12,troughcolor=PANEL,
-                        background='#999999',borderwidth=1,arrowsize=0,relief='flat',
-                        bordercolor='#cccccc',lightcolor='#cccccc',darkcolor='#444444')
-        style.map('Modern.Vertical.TScrollbar',background=[('pressed','#eeeeee'),('active','#dddddd')])
+        style.configure('Modern.Vertical.TScrollbar',width=10,troughcolor=PANEL,
+                        background='#55555d',borderwidth=0,arrowsize=0,relief='flat')
+        style.map('Modern.Vertical.TScrollbar',background=[('pressed',TEXT),('active',MUTED)])
 
     def build(self):
-        top=ttk.Frame(self,padding=(22,18,22,12)); top.pack(fill='x')
-        ttk.Label(top,text='◈  Emotional Atlas',style='Title.TLabel').pack(side='left')
-        ttk.Label(top,text='DREAMS  /  LITERATURE  /  SEMANTIC INFERENCE',style='Muted.TLabel',foreground=NEGATIVE_COLOR).pack(side='left',padx=22)
+        viewport=ttk.Frame(self);viewport.pack(fill='both',expand=True)
+        viewport.rowconfigure(0,weight=1);viewport.columnconfigure(0,weight=1)
+        self.workspace_canvas=tk.Canvas(viewport,background=BG,highlightthickness=0,
+                                        borderwidth=0,yscrollincrement=1,xscrollincrement=1)
+        self.scroll_remainder=0.0
+        self.workspace_size=None
+        self.workspace_canvas.grid(row=0,column=0,sticky='nsew')
+        vertical=ttk.Scrollbar(viewport,orient='vertical',command=self.workspace_canvas.yview)
+        vertical.grid(row=0,column=1,sticky='ns')
+        horizontal=ttk.Scrollbar(viewport,orient='horizontal',command=self.workspace_canvas.xview)
+        horizontal.grid(row=1,column=0,sticky='ew')
+        self.workspace_canvas.configure(yscrollcommand=vertical.set,xscrollcommand=horizontal.set)
+        self.workspace=ttk.Frame(self.workspace_canvas)
+        self.workspace_item=self.workspace_canvas.create_window(0,0,anchor='nw',window=self.workspace)
+        self.workspace.bind('<Configure>',self.resize_workspace)
+        self.workspace_canvas.bind('<Configure>',self.resize_workspace)
+        self.bind('<MouseWheel>',self.scroll_workspace,add='+')
+        self.bind('<Button-4>',self.scroll_workspace,add='+')
+        self.bind('<Button-5>',self.scroll_workspace,add='+')
+        self.bind('<FocusIn>',self.reveal_control,add='+')
+        top=ttk.Frame(self.workspace,padding=(24,20,24,18)); top.pack(fill='x')
+        ttk.Label(top,text='Emotional Atlas',style='Title.TLabel').pack(side='left')
+        ttk.Label(top,text='DREAMS  /  LITERATURE  /  SEMANTIC INFERENCE',style='Muted.TLabel').pack(side='left',padx=22)
         ttk.Button(top,text='Method',command=self.method).pack(side='right')
-        outer=ttk.Panedwindow(self,orient='horizontal'); outer.pack(fill='both',expand=True,padx=18)
+        ttk.Separator(self.workspace).pack(fill='x',padx=24,pady=(0,18))
+        outer=ttk.Panedwindow(self.workspace,orient='horizontal'); outer.pack(fill='both',expand=True,padx=18)
         left=ttk.Frame(outer,width=360,padding=(0,0,16,0)); outer.add(left,weight=0)
         right=ttk.Frame(outer); outer.add(right,weight=1)
         ttk.Label(left,text='01  Source text',style='Heading.TLabel').pack(anchor='w',pady=(4,12))
         row=ttk.Frame(left); row.pack(fill='x')
         self.open_btn=ttk.Button(row,text='Open .txt',command=self.open_text);self.open_btn.pack(side='left')
         ttk.Label(left,text='Or paste a dream or passage below.',style='Muted.TLabel').pack(anchor='w',pady=(12,6))
-        source_card=ttk.Frame(left,style='Card.TFrame');source_card.pack(fill='both',expand=True)
-        self.source=tk.Text(source_card,wrap='word',width=38,height=17,background=PANEL,foreground=TEXT,
-            insertbackground=TEXT,selectbackground='#dddddd',selectforeground='#111111',highlightthickness=0,relief='flat',padx=12,pady=12,font=('Menlo',12),undo=True)
+        source_card=ttk.Frame(left,style='Card.TFrame');source_card.pack(fill='x')
+        self.source=tk.Text(source_card,wrap='word',width=38,height=8,background=PANEL,foreground=TEXT,
+            insertbackground=TEXT,selectbackground='#44444e',selectforeground='#f2f2f3',highlightthickness=0,relief='flat',padx=12,pady=12,font=('Helvetica Neue',13),spacing1=3,spacing3=8,undo=True)
         source_scroll=ttk.Scrollbar(source_card,orient='vertical',style='Modern.Vertical.TScrollbar',command=self.source.yview)
         source_scroll.pack(side='right',fill='y',padx=(5,0))
         self.source.configure(yscrollcommand=source_scroll.set)
@@ -309,10 +356,21 @@ class Atlas(tk.Tk):
         ttk.Label(left,textvariable=self.stats,style='Muted.TLabel').pack(anchor='w')
         ttk.Separator(left).pack(fill='x',pady=15)
         ttk.Label(left,text='02  Inference',style='Heading.TLabel').pack(anchor='w',pady=(0,10))
-        ttk.Label(left,text='OpenAI API key · held in memory only',style='Muted.TLabel').pack(anchor='w')
+        ttk.Label(left,text='API provider',style='Muted.TLabel').pack(anchor='w')
+        self.provider_box=ttk.Combobox(left,textvariable=self.provider,values=['OpenAI','VT ARC'],state='readonly')
+        self.provider_box.pack(fill='x',pady=(6,8))
+        self.provider_box.bind('<<ComboboxSelected>>',self.update_provider)
+        self.key_label=ttk.Label(left,text='OpenAI API key · held in memory only',style='Muted.TLabel')
+        self.key_label.pack(anchor='w')
         self.key_entry=ttk.Entry(left,textvariable=self.key,show='•');self.key_entry.pack(fill='x',pady=(6,8))
-        ttk.Label(left,text='Model: gpt-6-luna  ·  API usage is billed to your key.',style='Muted.TLabel').pack(anchor='w')
-        ttk.Label(left,text='Analyze sends text + nearby context to OpenAI.\nNothing is saved locally until you export a session.',style='Muted.TLabel',wraplength=330).pack(anchor='w',pady=8)
+        self.arc_model_row=ttk.Frame(left)
+        ttk.Label(self.arc_model_row,text='ARC model ID',style='Muted.TLabel').pack(anchor='w')
+        self.arc_model_box=ttk.Combobox(self.arc_model_row,textvariable=self.arc_model,
+            values=[ARC_MODEL,'DeepSeek-V4.1-Flash','GLM-5.3'])
+        self.arc_model_box.pack(fill='x',pady=(4,8))
+        self.provider_note=ttk.Label(left,style='Muted.TLabel',wraplength=330)
+        self.provider_note.pack(anchor='w',pady=(0,8))
+        self.update_provider()
         self.range_box=ttk.Combobox(left,textvariable=self.range_count,values=['First 12 remaining','First 60 remaining','All remaining'],state='readonly')
         self.range_box.pack(fill='x',pady=(0,8))
         run=ttk.Frame(left);run.pack(fill='x')
@@ -338,9 +396,9 @@ class Atlas(tk.Tk):
         self.plot.on_draw=self.sync_expanded_plot
 
         legend=ttk.Frame(right);legend.pack(fill='x',pady=6)
-        ttk.Label(legend,text='● Negative',foreground=NEGATIVE_COLOR).pack(side='left',padx=8)
-        ttk.Label(legend,text='● Neutral',foreground=MUTED).pack(side='left',padx=8)
-        ttk.Label(legend,text='● Positive',foreground=POSITIVE_COLOR).pack(side='left',padx=8)
+        ttk.Label(legend,text='− Negative / red',foreground=TEXT).pack(side='left',padx=8)
+        ttk.Label(legend,text='0 Neutral / gray',foreground=MUTED).pack(side='left',padx=8)
+        ttk.Label(legend,text='+ Positive / blue',foreground=TEXT).pack(side='left',padx=8)
         ttk.Label(legend,text='One point = one paragraph',style='Muted.TLabel').pack(side='right',padx=10)
         playback=ttk.Frame(right);playback.pack(fill='x',pady=(4,4))
         self.play_btn=ttk.Button(playback,text='▶ Play',command=self.toggle_playback)
@@ -374,16 +432,79 @@ class Atlas(tk.Tk):
         self.tree.bind('<<TreeviewSelect>>',self.tree_select);self.tree.bind('<Double-1>',lambda e:self.inspect())
         detail_card=ttk.Frame(detail_frame,style='Card.TFrame');detail_card.pack(fill='both',expand=True,pady=6)
         self.detail=tk.Text(detail_card,wrap='word',height=12,background=PANEL,foreground=TEXT,
-            relief='flat',highlightthickness=0,selectbackground='#dddddd',selectforeground='#111111',padx=8,pady=6,font=('Menlo',12),state='disabled')
+            relief='flat',highlightthickness=0,selectbackground='#44444e',selectforeground='#f2f2f3',padx=8,pady=6,font=('Helvetica Neue',13),spacing3=6,state='disabled')
         detail_scroll=ttk.Scrollbar(detail_card,orient='vertical',style='Modern.Vertical.TScrollbar',command=self.detail.yview);detail_scroll.pack(side='right',fill='y')
         self.detail.configure(yscrollcommand=detail_scroll.set);self.detail.pack(fill='both',expand=True)
-        self.detail.tag_configure('heading',font=('Menlo',13,'bold'),foreground=BLUE,spacing1=12,spacing3=8)
+        self.detail.tag_configure('heading',font=('Helvetica Neue',15,'bold'),foreground=BLUE,spacing1=12,spacing3=8)
         self.detail.tag_configure('muted',foreground=MUTED,spacing3=8)
-        self.detail.tag_configure('signal',background='#dddddd',foreground='#111111')
+        self.detail.tag_configure('signal',background='#44444e',foreground='#f2f2f3')
         self.detail.tag_configure('quote',foreground=GOLD,spacing1=4,spacing3=6)
-        foot=ttk.Frame(self,padding=(20,9));foot.pack(fill='x')
+        foot=ttk.Frame(self.workspace,padding=(20,9));foot.pack(fill='x')
         self.progress=ttk.Progressbar(foot,mode='determinate',length=170);self.progress.pack(side='right')
         ttk.Label(foot,textvariable=self.status,style='Muted.TLabel',wraplength=1040).pack(side='left')
+
+    def update_provider(self,event=None):
+        arc=self.provider.get()=='VT ARC'
+        self.key=self.api_keys['arc' if arc else 'openai']
+        self.key_entry.configure(textvariable=self.key)
+        self.key_label.configure(text=('VT ARC' if arc else 'OpenAI')+' API key · held in memory only')
+        if arc:
+            self.arc_model_row.pack(fill='x',before=self.provider_note)
+        else:
+            self.arc_model_row.pack_forget()
+        self.provider_note.configure(text=(
+            'Text + nearby context go to VT ARC. Use your personal ARC key from llm.arc.vt.edu → Settings → Account → API keys. ARC logs interactions under VT policies.'
+            if arc else 'Model: '+MODEL+'. API billing applies. Text + nearby context go to OpenAI with store=false.'))
+
+    def resize_workspace(self,event=None):
+        canvas=self.workspace_canvas
+        width=max(canvas.winfo_width(),self.workspace.winfo_reqwidth())
+        height=max(canvas.winfo_height(),self.workspace.winfo_reqheight())
+        if (width,height)!=self.workspace_size:
+            self.workspace_size=(width,height)
+            canvas.itemconfigure(self.workspace_item,width=width,height=height)
+            canvas.configure(scrollregion=(0,0,width,height))
+
+    def scroll_workspace(self,event):
+        # Text, tables, and the plot retain their own scroll/zoom interactions.
+        widget=event.widget
+        if isinstance(widget,(tk.Text,EmotionPlot,ttk.Treeview,ttk.Combobox,ttk.Scale)):
+            return
+        if widget.winfo_toplevel() is not self:
+            return
+        # Canvas defaults to one tenth of the viewport per wheel event. That
+        # turns tiny macOS trackpad deltas into large, uneven jumps. Use pixel
+        # increments and retain the actual magnitude (including small deltas).
+        button=getattr(event,'num',None)
+        if button in (4,5):
+            pixels=-36 if button==4 else 36
+        else:
+            delta=getattr(event,'delta',0)
+            if not delta:return
+            pixels=-delta*(2 if self.tk.call('tk','windowingsystem')=='aqua' else 36/120)
+        self.scroll_remainder+=pixels
+        distance=math.trunc(self.scroll_remainder)
+        self.scroll_remainder-=distance
+        if distance:
+            self.workspace_canvas.yview_scroll(distance,'units')
+        return 'break'
+
+    def reveal_control(self,event):
+        # Tabbing to a control also brings it into the visible workspace.
+        widget=event.widget
+        if not str(widget).startswith(str(self.workspace)+'.'):
+            return
+        canvas=self.workspace_canvas
+        for axis in ('y','x'):
+            position=getattr(widget,'winfo_root'+axis)()-getattr(self.workspace,'winfo_root'+axis)()
+            size=getattr(widget,'winfo_'+('height' if axis=='y' else 'width'))()
+            visible=getattr(canvas,'winfo_'+('height' if axis=='y' else 'width'))()
+            extent=getattr(self.workspace,'winfo_'+('height' if axis=='y' else 'width'))()
+            start=getattr(canvas,'canvas'+axis)(0)
+            if position<start:
+                getattr(canvas,axis+'view_moveto')(max(0,position-12)/max(1,extent))
+            elif position+min(size,visible)>start+visible:
+                getattr(canvas,axis+'view_moveto')((position+min(size,visible)-visible+12)/max(1,extent))
 
     def text_modified(self,event=None):
         if self.source.edit_modified():
@@ -412,7 +533,7 @@ class Atlas(tk.Tk):
         self.source.configure(state='normal');self.source.delete('1.0','end');self.source.insert('1.0',text)
         self.paragraphs=split_paragraphs(text,self.mode_code());self.results={};self.reviews={};self.current_id=None
         self.session_text=text;self.title_text=title;self.usage={'input_tokens':0,'output_tokens':0};self.dirty=False
-        self.refresh();self.status.set(f'Loaded {title}. Ready for GPT-6 Luna analysis.')
+        self.refresh();self.status.set(f'Loaded {title}. Ready for analysis.')
 
     def open_text(self):
         if not self.confirm_replace():return
@@ -423,8 +544,11 @@ class Atlas(tk.Tk):
 
     def start(self):
         if self.running:return
+        provider='arc' if self.provider.get()=='VT ARC' else 'openai'
+        model=self.arc_model.get().strip() if provider=='arc' else MODEL
+        if not model:messagebox.showinfo('Model needed','Enter an ARC model ID.');return
         key=self.key.get().strip()
-        if not key:messagebox.showinfo('API key needed','Enter your OpenAI API key. It stays in memory and is never included in exports.');return
+        if not key:messagebox.showinfo('API key needed',f'Enter your {self.provider.get()} API key. It stays in memory and is never included in exports.');return
         paragraphs=split_paragraphs(self.source.get('1.0','end-1c'),self.mode_code())
         if not paragraphs:messagebox.showinfo('Add text','Paste text or open a UTF-8 .txt file first.');return
         if paragraphs!=self.paragraphs:
@@ -433,6 +557,13 @@ class Atlas(tk.Tk):
             self.results={};self.reviews={};self.usage={'input_tokens':0,'output_tokens':0};self.dirty=False;self.current_id=None
             self.paragraphs=paragraphs
             self.title_text='Custom text'
+        if (self.results or self.reviews) and (provider,model)!=(self.session_provider,self.session_model):
+            if not messagebox.askyesno('Start a new analysis?',
+                'Changing provider or model starts a new analysis to keep scores consistent. Save the current session first if you want to keep it. Start over?'):return
+            self.pause_playback();self.timeline.reset()
+            self.results={};self.reviews={};self.usage={'input_tokens':0,'output_tokens':0};self.current_id=None
+            self.dirty=True
+        self.session_provider=provider;self.session_model=model
         try:groups=list(batches(self.paragraphs,self.results))
         except AnalysisError as e:messagebox.showerror('Text needs paragraph breaks',str(e));return
         maximum={'First 12 remaining':12,'First 60 remaining':60}.get(self.range_count.get())
@@ -444,14 +575,14 @@ class Atlas(tk.Tk):
             groups=limited
         if not groups:self.status.set('All paragraphs have already been analyzed.');return
         self.cancel.clear();self.running=True;self.set_running(True);self.refresh()
-        self.status.set(f'Analyzing {sum(len(g) for g in groups)} paragraphs using GPT-6 Luna…')
+        self.status.set(f'Analyzing {sum(len(g) for g in groups)} paragraphs using {model} ({self.provider.get()})…')
         def worker():
             review_count=0
             try:
                 for group in groups:
                     if self.cancel.is_set():break
-                    self.events.put(('status',f"Inferring paragraphs {group[0]['id']}–{group[-1]['id']} with GPT-6 Luna…"))
-                    for event in analyze_resilient_batch(group,key,self.cancel,lambda s:self.events.put(('status',s))):
+                    self.events.put(('status',f"Inferring paragraphs {group[0]['id']}–{group[-1]['id']} with {model}…"))
+                    for event in analyze_resilient_batch(group,key,self.cancel,lambda s:self.events.put(('status',s)),provider=provider,model=model):
                         if event[0]=='review':review_count+=1
                         self.events.put(event)
                 self.events.put(('done','Stopped. Completed results retained; Analyze / Resume continues.' if self.cancel.is_set() else f'Run finished. {review_count} paragraph(s) need review; verified results retained. Save a session to keep the results.'))
@@ -469,6 +600,8 @@ class Atlas(tk.Tk):
         state='disabled' if running else 'normal'
         for btn in (self.open_btn,self.run_btn,self.load_btn):btn.configure(state=state)
         self.source.configure(state=state);self.key_entry.configure(state=state)
+        self.provider_box.configure(state='disabled' if running else 'readonly')
+        self.arc_model_box.configure(state=state)
         self.mode_box.configure(state='disabled' if running else 'readonly')
         self.range_box.configure(state='disabled' if running else 'readonly')
         self.stop_btn.configure(state='normal' if running else 'disabled')
@@ -742,7 +875,7 @@ class Atlas(tk.Tk):
         path=filedialog.asksaveasfilename(defaultextension='.json',initialfile='emotion-atlas-session.json',filetypes=[('Atlas session','*.json')])
         if path:
             try:
-                Path(path).write_text(json.dumps(export_session(self.paragraphs,self.results,self.title_text,self.usage,self.reviews),ensure_ascii=False,indent=2),encoding='utf-8')
+                Path(path).write_text(json.dumps(export_session(self.paragraphs,self.results,self.title_text,self.usage,self.reviews,provider=self.session_provider,model=self.session_model),ensure_ascii=False,indent=2),encoding='utf-8')
                 self.dirty=False;self.status.set('Session saved with source text and evidence. API key was not saved.')
             except OSError as e:messagebox.showerror('Save failed',str(e))
 
@@ -753,6 +886,10 @@ class Atlas(tk.Tk):
         try:
             data=json.loads(Path(path).read_text(encoding='utf-8'));paragraphs,results=load_session(data)
             self.mode.set('Blank lines');self.set_source('\n\n'.join(paragraphs),str(data.get('title','Imported session')))
+            self.session_provider=data.get('provider','openai');self.session_model=data.get('model',MODEL)
+            self.provider.set('VT ARC' if self.session_provider=='arc' else 'OpenAI')
+            if self.session_provider=='arc':self.arc_model.set(self.session_model)
+            self.update_provider()
             self.results=results
             reviews=data.get('reviews',{})
             self.reviews={int(k):v for k,v in reviews.items() if isinstance(k,str) and k.isdigit() and 1<=int(k)<=len(paragraphs) and int(k) not in results and isinstance(v,str)} if isinstance(reviews,dict) else {}
@@ -770,7 +907,7 @@ class Atlas(tk.Tk):
                 with open(path,'w',encoding='utf-8-sig',newline='') as f:
                     w=csv.writer(f);w.writerow(['paragraph','intensity','valence','direction','direction_status','tone','uncertainty','emotions','summary','text','model'])
                     for i,r in sorted(self.results.items()):
-                        row=[i,r['intensity'],r['valence'],r['direction'],r['direction_status'],r['tone'],r['uncertainty'],', '.join(e['label'] for e in r['emotions']),r['summary'],self.paragraphs[i-1],MODEL]
+                        row=[i,r['intensity'],r['valence'],r['direction'],r['direction_status'],r['tone'],r['uncertainty'],', '.join(e['label'] for e in r['emotions']),r['summary'],self.paragraphs[i-1],self.session_model]
                         # Protect imported spreadsheet cells from formula interpretation.
                         w.writerow(["'"+v if isinstance(v,str) and v.lstrip().startswith(('=','+','-','@')) else v for v in row])
                 self.status.set('Paragraph scores exported to CSV. Save a session for full evidence and resuming.')
@@ -778,7 +915,7 @@ class Atlas(tk.Tk):
 
     def method(self):
         messagebox.showinfo('About the analysis',
-            'GPT-6 Luna infers emotional meaning from each paragraph and nearby context.\n\n'
+            'The selected model infers emotional meaning from each paragraph and nearby context.\n\n'
             'Intensity: 0 absent → 1 extreme strength of feeling.\n'
             'Valence: −1 unpleasant → +1 pleasant. Opposing feelings can balance valence without lowering intensity.\n'
             'Direction: −1 internal/self-focused → +1 directed toward others or the world. Unclear direction is not plotted.\n\n'
@@ -786,8 +923,8 @@ class Atlas(tk.Tk):
             'These are interpretive estimates, not validated psychological measurements or a diagnosis. '
             'Uncertainty is a model judgment, not a calibrated probability.\n\n'
             'Paragraphs are sent in batches of up to 6, with up to 1,200 characters of neighboring context per side. '
-            'There is no whole-book memory. The key stays in memory; API requests use store=false. '
-            'OpenAI API data policies still apply.\n\n'
+            'There is no whole-book memory. Keys stay in memory and are excluded from exports. '
+            'OpenAI requests use store=false. VT ARC requests go to ARC, which logs interactions under VT policies.\n\n'
             'Open any UTF-8 .txt file or paste your own text to begin.',parent=self)
 
     def close(self):
@@ -796,7 +933,9 @@ class Atlas(tk.Tk):
         elif self.dirty:
             if not messagebox.askyesno('Unsaved results','Quit without saving the current session?'):return
         self.pause_playback()
-        self.cancel.set();self.key.set('');self.destroy()
+        self.cancel.set()
+        for key in self.api_keys.values():key.set('')
+        self.destroy()
 
 
 if __name__=='__main__':

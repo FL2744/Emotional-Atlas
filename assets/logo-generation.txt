@@ -1,10 +1,4 @@
-Created with the built-in Image Generation tool using emotion-atlas-icon.png as reference.
+Created with the built-in Image Generation tool using the current monochrome emotion-atlas-icon.png as reference.
 
 Prompt:
-Use case: logo-brand. Create a polished horizontal README logo banner, 3:1 aspect ratio, for the desktop app with EXACT title text: "Emotional Atlas". Use the provided constellation app icon as the visual mark on the left, preserve its recognizable glowing cyan, blue and coral orbital points and midnight-blue tile. To the right, set "Emotional Atlas" in large crisp white retro monospace-inspired lettering, highly readable, sophisticated understated 1980s scientific-terminal aesthetic. Solid royal-blue background (#1643b8), hard rectangular outer edges, balanced generous padding. No subtitle, no other text, no watermark, no mockup. The icon should occupy roughly one quarter of the banner width. This is the finished flat banner asset, not a screenshot.
-
-
-v0.2: Recolored existing logo to black, white, and gray with imagegen, preserving the Emotional Atlas wordmark and constellation composition.
-
-
-v0.3: Imagegen localized recolor: alternating red and blue constellation spheres. Preserve grayscale surroundings, composition, transparency, and white lettering.
+Use case: logo-brand. Finished GitHub README banner, 3:1 aspect ratio. Solid near-black #111113 backdrop. On the left reproduce the reference white six-node trajectory and thin gray orbital contours without a tile. On the right set the exact title Emotional Atlas in large clean contemporary white sans-serif typography, title case, one line. Balanced spacing and generous padding. Strictly white and gray on near black. No red or blue, glow, shadows, bevel, stars, retro lettering, tagline, additional text, or mockup.

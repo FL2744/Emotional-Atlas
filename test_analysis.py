@@ -211,4 +211,71 @@ class ResilientAnalysisTests(unittest.TestCase):
         with self.assertRaisesRegex(AnalysisError,'API key'):
             list(analyze_resilient_batch(self.batch,'test',threading.Event(),opener=fail))
 
+class ArcTests(unittest.TestCase):
+    def setUp(self):
+        self.batch=[{'id':1,'text':'I was furious with myself.','context_before':'','context_after':''}]
+    def response(self, row, finish='stop'):
+        return io.StringIO(json.dumps({'choices':[{'finish_reason':finish,
+            'message':{'content':json.dumps({'paragraphs':[row]})}}],
+            'usage':{'prompt_tokens':12,'completion_tokens':34,'total_tokens':46}}))
+
+    def test_arc_request_and_usage(self):
+        def send(request,timeout):
+            self.assertEqual(request.full_url,ARC_ENDPOINT)
+            self.assertEqual(request.get_header('Authorization'),'Bearer arc-secret')
+            body=json.loads(request.data)
+            self.assertEqual(body['model'],ARC_MODEL)
+            self.assertNotIn('instructions',body)
+            self.assertNotIn('reasoning',body)
+            self.assertEqual(body['response_format'],{'type':'json_object'})
+            self.assertIn('schema',body['messages'][0]['content'])
+            self.assertNotIn('arc-secret',request.data.decode())
+            return self.response(example())
+        rows,usage=analyze_batch(self.batch,'arc-secret',threading.Event(),opener=send,provider='arc')
+        self.assertEqual(rows[0]['id'],1)
+        self.assertEqual(usage,{'input_tokens':12,'output_tokens':34,'total_tokens':46})
+
+    def test_arc_repair_uses_same_provider_and_model(self):
+        calls=[]
+        def send(request,timeout):
+            self.assertEqual(request.full_url,ARC_ENDPOINT)
+            body=json.loads(request.data);calls.append(body)
+            self.assertEqual(body['model'],'custom-arc-model')
+            row=example()
+            if len(calls)==1:
+                row['emotions'][0]['evidence'][0]['quote']='invented quote'
+            else:
+                self.assertIn('source_words',body['messages'][1]['content'])
+                row['emotions'][0]['evidence']=[{'word_ids':[2,4], 'explanation':'Exact words.'}]
+            return self.response(row)
+        events=list(analyze_resilient_batch(self.batch,'arc-secret',threading.Event(),
+            opener=send,provider='arc',model='custom-arc-model'))
+        self.assertEqual(len(calls),2)
+        self.assertEqual(events[-1][1][0][0]['emotions'][0]['evidence'][0]['quote'],'furious with myself')
+
+    def test_arc_incomplete_and_malformed_response(self):
+        for reply in (lambda:self.response(example(),'length'),lambda:io.StringIO('{"choices":[]}')):
+            with self.assertRaises(AnalysisError):
+                analyze_batch(self.batch,'test',threading.Event(),opener=lambda *a,**k:reply(),provider='arc')
+
+    def test_arc_auth_error_names_provider_without_secret(self):
+        def send(*a,**k):
+            raise urllib.error.HTTPError(ARC_ENDPOINT,401,'arc-secret',{},None)
+        with self.assertRaises(AnalysisError) as error:
+            analyze_batch(self.batch,'arc-secret',threading.Event(),opener=send,provider='arc')
+        self.assertIn('VT ARC',str(error.exception))
+        self.assertNotIn('arc-secret',str(error.exception))
+
+    def test_arc_session_and_legacy_openai(self):
+        data=export_session([self.batch[0]['text']],{1:example()},'ARC',{},provider='arc',model='custom-arc-model')
+        self.assertEqual(data['provider'],'arc')
+        self.assertEqual(data['model'],'custom-arc-model')
+        self.assertEqual(load_session(data)[1][1]['id'],1)
+        legacy=export_session([self.batch[0]['text']],{1:example()},'OpenAI',{})
+        del legacy['provider']
+        self.assertEqual(load_session(legacy)[1][1]['id'],1)
+        data['provider']='unknown'
+        with self.assertRaises(AnalysisError):load_session(data)
+
+
 if __name__=='__main__':unittest.main()

@@ -1,17 +1,17 @@
-<p align="center"><img src="assets/emotional-atlas-logo.png" width="100%" alt="Emotional Atlas — red and blue constellation icon and retro white wordmark"></p>
+<p align="center"><img src="assets/emotional-atlas-logo.png" width="100%" alt="Emotional Atlas — white constellation mark and clean white wordmark on charcoal"></p>
 
 # Emotional Atlas
 
 **Explore emotional shifts in dreams and literature, paragraph by paragraph.**
 
-Emotional Atlas is a native desktop application that uses **GPT-6 Luna** to infer emotional meaning, identify supporting words and passages, and map paragraphs in an interactive 3D space. It includes text-order animation, PCA views, and resumable analysis sessions in a retro black, white, and gray interface with red and blue plot points and title accents.
+Emotional Atlas is a native desktop application that uses **OpenAI GPT-6 Luna or a VT ARC model** to infer emotional meaning, identify supporting words and passages, and map paragraphs in an interactive 3D space. It includes text-order animation, PCA views, and resumable analysis sessions in a dark monochrome interface inspired by FENNEC and LAMP, with red-to-blue valence colors reserved for plot points.
 
 [Download macOS v0.3](https://github.com/FL2744/emotion-atlas/releases/tag/v0.3) · [User guide](docs/USER_GUIDE.md) · [Release notes](CHANGELOG.md)
 
 ## Features
 
 - Open UTF-8 `.txt` files or paste text; split by blank lines or individual lines.
-- Infer intensity, valence, and inward/outward direction with `gpt-6-luna`.
+- Infer intensity, valence, and inward/outward direction with OpenAI `gpt-6-luna` or a VT ARC model.
 - Inspect emotional components, experiencers, targets, exact evidence, and highlighted signal words.
 - Rotate, zoom, and click paragraphs in the 3D plot; open a synchronized expanded plot at up to twice the display area.
 - Animate existing results in text order with pause, restart, scrubbing, and adjustable speed. **Playback requires no API key or new inference.**
@@ -32,7 +32,7 @@ Python and Tk are bundled; no separate Python installation is needed for this do
 ## First analysis
 
 1. Choose **Open .txt**, or paste a passage.
-2. Enter your own OpenAI API key. Your API project must have access to `gpt-6-luna` and sufficient API quota; API use is billed to that project.
+2. Choose **OpenAI** or **VT ARC** under **API provider**, then enter your personal key. OpenAI uses `gpt-6-luna` and bills your API project. VT ARC defaults to `gpt-oss-120b`; choose or enter another ARC model ID if needed. Create your personal ARC key at [llm.arc.vt.edu](https://llm.arc.vt.edu/) under **Settings → Account → API keys**. See [ARC’s API documentation](https://docs.arc.vt.edu/ai/011_llm_api_arc_vt_edu.html).
 3. For a small trial, select **First 12 remaining** and click **Analyze / Resume**.
 4. Click a plotted point to inspect the text and why it received its scores.
 5. Click **Save session** to preserve the source and results. Reopen that JSON file with **Open session** later.
@@ -56,7 +56,9 @@ These are model-generated interpretations, not validated psychological measureme
 ## Privacy and reliability
 
 - Your key stays in process memory and is excluded from saved sessions and exports.
-- Analysis sends target paragraphs and nearby context directly to OpenAI's Responses API, with `store=false`. OpenAI's applicable API data policies still apply.
+- Analysis sends target paragraphs and nearby context directly to the selected provider. OpenAI uses the Responses API with `store=false`. VT ARC uses its Chat Completions API; ARC logs interactions under VT policies. Provider data policies apply.
+- Provider keys are separate and stay in memory. Sessions record the provider and model, never keys. Legacy OpenAI sessions remain compatible. Changing model or provider for existing results requires starting a new analysis, so scores from different models are not mixed.
+- ARC uses JSON mode with the same local score, schema, and evidence validation and source-word repair as OpenAI. The selected ARC model must support JSON mode. No alternate model is silently substituted.
 - No analytics, cloud storage, or automatic local session saving is implemented.
 - Saved sessions include the full source text and analysis. Keep them private if the text is sensitive. The repository excludes session files, exports, environment files, and build outputs by default.
 - Long documents are processed incrementally. Nearby context is included, but the model does not maintain whole-book memory.
