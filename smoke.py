@@ -65,7 +65,7 @@ def run_smoke_test(app_class, report_path):
         app.plot.rows=[];app.plot.draw()
         assert len(app.plot.find_all())==1  # A single prompt, no placeholder cube.
         app.dirty=False
-        report_path.write_text(json.dumps({'version':'0.3','status':'passed','checks':[
+        report_path.write_text(json.dumps({'version':(__import__('pathlib').Path(__file__).parent/'VERSION').read_text().strip(),'status':'passed','checks':[
             'native Tk startup','icon','monochrome controls','paragraph plot','expanded plot synchronization',
             'PCA 2D and 3D','playback from saved-style data','restore plot',
             'proportional pixel scrolling','nested scroll isolation','small-window scrolling','footer access','keyboard focus visibility','uncluttered empty plot','provider switching','separate in-memory keys','provider controls locked during analysis']},indent=2))

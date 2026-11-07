@@ -207,7 +207,7 @@ class EmotionPlot(tk.Canvas):
 class Atlas(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title('Emotional Atlas v0.3')
+        self.title('Emotional Atlas v'+(BASE/'VERSION').read_text().strip())
         self.geometry('1390x920')
         self.minsize(900,600)
         self.configure(background=BG)

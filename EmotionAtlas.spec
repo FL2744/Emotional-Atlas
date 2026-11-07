@@ -1,6 +1,9 @@
 # PyInstaller specification. Run from the repository root on macOS.
 from pathlib import Path
+import os
 root = Path(SPECPATH)
+version = (root/'VERSION').read_text().strip()
+signing_identity = os.environ.get('DEVELOPER_ID_APPLICATION')
 a = Analysis([str(root/'app.py')], pathex=[str(root)],
     binaries=[], datas=[(str(root/'assets/emotion-atlas-icon-small.png'), 'assets'), (str(root/'LICENSE'), '.'),
                         (str(root/'THIRD_PARTY_NOTICES.md'), '.'), (str(root/'VERSION'), '.'), (str(root/'licenses'), 'licenses')],
@@ -8,10 +11,10 @@ a = Analysis([str(root/'app.py')], pathex=[str(root)],
 pyz = PYZ(a.pure)
 exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name='Emotional Atlas', debug=False,
           bootloader_ignore_signals=False, strip=False, upx=False, console=False,
-          target_arch='arm64', codesign_identity=None, entitlements_file=None)
+          target_arch='arm64', codesign_identity=signing_identity, entitlements_file=None)
 coll = COLLECT(exe, a.binaries, a.datas, strip=False, upx=False, name='Emotional Atlas')
 app = BUNDLE(coll, name='Emotional Atlas.app', icon=str(root/'assets/emotion-atlas.icns'),
-    bundle_identifier='com.github.FL2744.emotion-atlas', version='0.3',
-    info_plist={'CFBundleDisplayName':'Emotional Atlas', 'CFBundleShortVersionString':'0.3',
-                'CFBundleVersion':'3', 'LSMinimumSystemVersion':'15.0',
+    bundle_identifier='com.github.FL2744.emotion-atlas', version=version,
+    info_plist={'CFBundleDisplayName':'Emotional Atlas', 'CFBundleShortVersionString':version,
+                'CFBundleVersion':version, 'LSMinimumSystemVersion':'15.0',
                 'NSHighResolutionCapable':True, 'NSHumanReadableCopyright':'Copyright 2026 Emotional Atlas contributors'})

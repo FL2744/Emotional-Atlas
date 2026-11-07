@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.5 — 2026-11-06
+
+- Added VT ARC API support, separate in-memory provider keys, and selectable ARC models.
+- Preserved provider and model in sessions, with legacy OpenAI session compatibility.
+- Refreshed the dark monochrome interface, icon, and GitHub logo while retaining colored plot points.
+- Made the workspace scrollable with proportional trackpad scrolling and keyboard focus visibility.
+- Reduced the source field height and removed the empty plot’s decorative cube.
+- Distributed as a Developer ID signed, Apple-notarized macOS app.
+
 ## v0.3 — 2026-10-23
 
 - Restored colored plot points: red for negative valence, gray for neutral, and blue for positive.

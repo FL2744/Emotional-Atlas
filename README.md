@@ -6,7 +6,7 @@
 
 Emotional Atlas is a native desktop application that uses **OpenAI GPT-6 Luna or a VT ARC model** to infer emotional meaning, identify supporting words and passages, and map paragraphs in an interactive 3D space. It includes text-order animation, PCA views, and resumable analysis sessions in a dark monochrome interface inspired by FENNEC and LAMP, with red-to-blue valence colors reserved for plot points.
 
-[Download macOS v0.3](https://github.com/FL2744/emotion-atlas/releases/tag/v0.3) · [User guide](docs/USER_GUIDE.md) · [Release notes](CHANGELOG.md)
+[Download macOS v0.5](https://github.com/FL2744/emotion-atlas/releases/tag/v0.5) · [User guide](docs/USER_GUIDE.md) · [Release notes](CHANGELOG.md)
 
 ## Features
 
@@ -21,13 +21,14 @@ Emotional Atlas is a native desktop application that uses **OpenAI GPT-6 Luna or
 
 ## Install on macOS
 
-The v0.3 binary targets **Apple Silicon (arm64), macOS 15 or later**. It was built and smoke-tested on macOS 15.6. Intel and other operating systems do not have packaged releases yet.
+The v0.5 binary targets **Apple Silicon (arm64), macOS 15 or later**. The bundled binaries are checked for a macOS 15.0 or earlier deployment target; the packaged app is smoke-tested on macOS 26.6.2. Intel and other operating systems do not have packaged releases yet.
 
-1. Download `Emotional-Atlas-v0.3-macOS-arm64.zip` from the [v0.3 release](https://github.com/FL2744/emotion-atlas/releases/tag/v0.3).
+1. Download `Emotional-Atlas-v0.5-macOS-arm64.zip` from the [v0.5 release](https://github.com/FL2744/emotion-atlas/releases/tag/v0.5).
 2. Extract the ZIP and drag **Emotional Atlas.app** into Applications.
 3. Open the app.
 
-Python and Tk are bundled; no separate Python installation is needed for this download. The release is **ad-hoc signed, not Developer ID signed or notarized by Apple**. macOS may initially block it. If you trust this release, use macOS **System Settings → Privacy & Security → Open Anyway** after attempting to open it. Do not disable Gatekeeper globally. A SHA-256 checksum accompanies the download.
+Python and Tk are bundled; no separate Python installation is needed for this download. The release is **Developer ID signed and Apple-notarized**, with the notarization ticket stapled to the app. A SHA-256 checksum accompanies the download. macOS may show its normal first-launch confirmation for an app downloaded from the Internet.
+
 
 ## First analysis
 
@@ -86,7 +87,15 @@ python3 -m unittest discover -p 'test_*.py' -v
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements-build.txt
-bash scripts/build_macos.sh
+PYTHON="$PWD/.venv/bin/python" bash scripts/build_macos.sh
+```
+
+For a signed, notarized release, use your installed Developer ID certificate and an existing Keychain notarization profile (never store Apple credentials in the repository):
+
+```bash
+DEVELOPER_ID_APPLICATION="Developer ID Application: Your Name (TEAMID)" \
+NOTARY_PROFILE="your-notary-profile" \
+PYTHON="$PWD/.venv/bin/python" bash scripts/release_notarized.sh
 ```
 
 The build creates `dist/Emotional Atlas.app` and a ZIP in `release/`. It uses PyInstaller and does not require an API key. The app provides an explicit offline release check:
