@@ -4,3 +4,5 @@ Current dark monochrome redesign prompt:
 Use case: logo-brand. Redesign the supplied Emotional Atlas app icon to match a restrained contemporary dark monochrome desktop application. Square app icon with a near-black background and subtle charcoal rounded-square tile. Six off-white circular nodes connected by one clean rising curved path, with thin gray orbital contour lines. Preserve the constellation / trajectory identity; remove red and blue, glossy glass, stars, bevels, glow, and 3D effects. Crisp flat geometry readable at 32px. No text or mockup.
 
 The generated master was resized with sips for the 1024px source, 128px Tk icon, and a complete 16–1024px macOS iconset packaged using iconutil.
+
+v0.5.2 built-in image-generation edit: Preserve the existing solid charcoal rounded tile and monochrome constellation. Make only the surrounding rectangular background transparent, with smooth rounded boundaries.

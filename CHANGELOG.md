@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.2 — 2026-11-06
+
+- Gave the desktop icon a transparent exterior so the charcoal tile has rounded edges in Finder and the Dock.
+- Preserved the monochrome constellation artwork and application behavior.
+
 ## v0.5.1 — 2026-11-06
 
 - Fixed immediate API connection failures in the packaged app by bundling the Python runtime’s required TLS trust-policy file.
