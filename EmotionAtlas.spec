@@ -1,12 +1,17 @@
 # PyInstaller specification. Run from the repository root on macOS.
 from pathlib import Path
 import os
+import sysconfig
 root = Path(SPECPATH)
 version = (root/'VERSION').read_text().strip()
 signing_identity = os.environ.get('DEVELOPER_ID_APPLICATION')
+# Some Python distributions load additional trust-policy data during SSLContext
+# construction. Preserve that runtime file beside the frozen ssl module.
+ssl_policy = Path(sysconfig.get_path('stdlib'))/'codex-rejected-cas.pem'
+ssl_data = [(str(ssl_policy), '.')] if ssl_policy.is_file() else []
 a = Analysis([str(root/'app.py')], pathex=[str(root)],
     binaries=[], datas=[(str(root/'assets/emotion-atlas-icon-small.png'), 'assets'), (str(root/'LICENSE'), '.'),
-                        (str(root/'THIRD_PARTY_NOTICES.md'), '.'), (str(root/'VERSION'), '.'), (str(root/'licenses'), 'licenses')],
+                        (str(root/'THIRD_PARTY_NOTICES.md'), '.'), (str(root/'VERSION'), '.'), (str(root/'licenses'), 'licenses')] + ssl_data,
     hiddenimports=[], hookspath=[], hooksconfig={}, runtime_hooks=[], excludes=[], noarchive=False)
 pyz = PYZ(a.pure)
 exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name='Emotional Atlas', debug=False,

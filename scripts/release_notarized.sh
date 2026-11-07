@@ -5,6 +5,8 @@ cd "$(dirname "$0")/.."
 : "${NOTARY_PROFILE:?Set NOTARY_PROFILE to a notarytool Keychain profile}"
 export DEVELOPER_ID_APPLICATION
 bash scripts/build_macos.sh
+'dist/Emotional Atlas.app/Contents/MacOS/Emotional Atlas' --connection-check "$PWD/release/connection-check.json"
+"${PYTHON:-python3}" -c 'import json; report=json.load(open("release/connection-check.json")); assert all(item["connected"] for item in report.values()), report'
 VERSION="$(cat VERSION)"
 APP='dist/Emotional Atlas.app'
 ZIP="release/Emotional-Atlas-v${VERSION}-macOS-arm64.zip"

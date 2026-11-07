@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.5.1 — 2026-11-06
+
+- Fixed immediate API connection failures in the packaged app by bundling the Python runtime’s required TLS trust-policy file.
+- Preserved certificate verification and loaded the macOS certificate bundle directly.
+- Distinguished actual timeouts, connection interruptions, and missing runtime files in error messages.
+- Added a keyless packaged HTTPS connection check to release verification.
+
 ## v0.5 — 2026-11-06
 
 - Added VT ARC API support, separate in-memory provider keys, and selectable ARC models.

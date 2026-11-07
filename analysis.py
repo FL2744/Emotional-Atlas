@@ -302,11 +302,13 @@ def analyze_resilient_batch(batch, key, cancel, status=lambda message: None, ope
 
 
 def secure_urlopen(request, timeout):
-    # python.org macOS installations may not have run Install Certificates.command.
-    # Use the OS-provided CA bundle, never an unverified SSL context.
-    context = ssl.create_default_context()
+    # The frozen runtime's compiled-in CA path can refer to the build machine.
+    # Load the macOS trust bundle directly, before trying runtime defaults.
     if sys.platform == 'darwin' and Path('/etc/ssl/cert.pem').is_file():
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         context.load_verify_locations(cafile='/etc/ssl/cert.pem')
+    else:
+        context = ssl.create_default_context()
     return urllib.request.urlopen(request, timeout=timeout, context=context)
 
 
@@ -408,8 +410,13 @@ def analyze_batch(batch, key, cancel, status=lambda message: None, opener=None, 
             if isinstance(error.reason, ssl.SSLCertVerificationError):
                 raise AnalysisError('HTTPS certificate verification failed. Check your Python CA certificates or your network’s trusted certificate setup. No unverified connection was made.') from None
             raise AnalysisError(f'Could not connect to {name}. Check your internet connection, proxy, or firewall, then resume.') from None
-        except (TimeoutError, OSError):
-            raise AnalysisError(f'The {name} request timed out or the connection was interrupted. Resume to retry. The request may have incurred API usage.') from None
+        except TimeoutError:
+            raise AnalysisError(f'The {name} request timed out after waiting for a response. Resume to retry. The request may have incurred API usage.') from None
+        except FileNotFoundError:
+            raise AnalysisError('The app could not load a required network or certificate file. Update to the latest app release; this is not an API timeout.') from None
+        except OSError as error:
+            code = f' (system error {error.errno})' if error.errno is not None else ''
+            raise AnalysisError(f'The {name} connection was interrupted{code}. Check your network, then resume. The request may have incurred API usage.') from None
         except (json.JSONDecodeError, KeyError, TypeError, IndexError):
             raise AnalysisError('The API returned an invalid response. Resume to retry this batch.') from None
 

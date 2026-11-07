@@ -940,7 +940,24 @@ class Atlas(tk.Tk):
 
 if __name__=='__main__':
     import sys
-    if len(sys.argv)==3 and sys.argv[1]=='--smoke-test':
+    if len(sys.argv)==3 and sys.argv[1]=='--connection-check':
+        # Keyless HTTPS probe: no text, authentication, or inference request.
+        import urllib.request
+        import urllib.error
+        from analysis import secure_urlopen, ENDPOINT, ARC_ENDPOINT
+        report={}
+        for provider,url in [('openai',ENDPOINT),('arc',ARC_ENDPOINT)]:
+            try:
+                with secure_urlopen(urllib.request.Request(url),timeout=15) as response:
+                    report[provider]={'connected':True,'http_status':response.status}
+            except urllib.error.HTTPError as error:
+                report[provider]={'connected':True,'http_status':error.code}
+            except Exception as error:
+                report[provider]={'connected':False,'error_type':type(error).__name__,
+                    'detail':str(error),'errno':getattr(error,'errno',None),
+                    'traceback':__import__('traceback').format_exc()}
+        Path(sys.argv[2]).write_text(json.dumps(report,indent=2))
+    elif len(sys.argv)==3 and sys.argv[1]=='--smoke-test':
         from smoke import run_smoke_test
         run_smoke_test(Atlas,Path(sys.argv[2]))
     else:

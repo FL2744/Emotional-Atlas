@@ -278,4 +278,28 @@ class ArcTests(unittest.TestCase):
         with self.assertRaises(AnalysisError):load_session(data)
 
 
+class TransportTests(unittest.TestCase):
+    def test_mac_context_uses_system_bundle_with_verification(self):
+        from unittest.mock import patch, MagicMock
+        context=MagicMock()
+        with patch('analysis.sys.platform','darwin'), patch('analysis.Path.is_file',return_value=True), \
+             patch('analysis.ssl.SSLContext',return_value=context) as constructor, \
+             patch('analysis.ssl.create_default_context') as defaults, \
+             patch('analysis.urllib.request.urlopen') as send:
+            secure_urlopen('https://example.invalid',15)
+            constructor.assert_called_once_with(ssl.PROTOCOL_TLS_CLIENT)
+            context.load_verify_locations.assert_called_once_with(cafile='/etc/ssl/cert.pem')
+            defaults.assert_not_called()
+            send.assert_called_once_with('https://example.invalid',timeout=15,context=context)
+
+    def test_network_failures_are_not_all_reported_as_timeouts(self):
+        batch=[{'id':1,'text':'Test.','context_before':'','context_after':''}]
+        for error,expected in [(TimeoutError(),'timed out'),
+                               (FileNotFoundError(2,'missing'),'certificate file'),
+                               (ConnectionResetError(54,'reset'),'system error 54')]:
+            def fail(*args,**kwargs):raise error
+            with self.subTest(error=type(error).__name__),self.assertRaisesRegex(AnalysisError,expected):
+                analyze_batch(batch,'test-secret',threading.Event(),opener=fail)
+
+
 if __name__=='__main__':unittest.main()
