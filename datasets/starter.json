@@ -1,0 +1,272 @@
+[
+  {
+    "id": "en-seed-0",
+    "language": "en",
+    "phrase": "get your goat",
+    "meaning": "To annoy or deliberately provoke someone.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-1",
+    "language": "en",
+    "phrase": "spill the beans",
+    "meaning": "To disclose a secret.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-2",
+    "language": "en",
+    "phrase": "let the cat out of the bag",
+    "meaning": "To reveal something intended to remain secret.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-3",
+    "language": "en",
+    "phrase": "walk on eggshells",
+    "meaning": "To behave very cautiously to avoid upsetting someone.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-4",
+    "language": "en",
+    "phrase": "elephant in the room",
+    "meaning": "An obvious important issue that people avoid discussing.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-5",
+    "language": "en",
+    "phrase": "break the ice",
+    "meaning": "To ease initial social awkwardness.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-6",
+    "language": "en",
+    "phrase": "burn bridges",
+    "meaning": "To destroy relationships or future options.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-7",
+    "language": "en",
+    "phrase": "bury the hatchet",
+    "meaning": "To end a conflict.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-8",
+    "language": "en",
+    "phrase": "kick the bucket",
+    "meaning": "To die; an informal expression.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-9",
+    "language": "en",
+    "phrase": "skeleton in the closet",
+    "meaning": "A concealed shameful secret.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-10",
+    "language": "en",
+    "phrase": "a fish out of water",
+    "meaning": "Someone uncomfortable in an unfamiliar setting.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-11",
+    "language": "en",
+    "phrase": "the last straw",
+    "meaning": "The final small burden that makes a situation intolerable.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-12",
+    "language": "en",
+    "phrase": "pull the rug out from under",
+    "meaning": "To suddenly remove support.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-13",
+    "language": "en",
+    "phrase": "hit the nail on the head",
+    "meaning": "To identify something precisely.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-14",
+    "language": "en",
+    "phrase": "bite the hand that feeds you",
+    "meaning": "To harm someone who supports you.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-15",
+    "language": "en",
+    "phrase": "a wolf in sheep’s clothing",
+    "meaning": "A dangerous person disguised as harmless.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-16",
+    "language": "en",
+    "phrase": "cry over spilled milk",
+    "meaning": "To dwell on an irreversible loss.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-17",
+    "language": "en",
+    "phrase": "hold your tongue",
+    "meaning": "To refrain from speaking.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-18",
+    "language": "en",
+    "phrase": "under the weather",
+    "meaning": "Feeling ill.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "en-seed-19",
+    "language": "en",
+    "phrase": "a storm in a teacup",
+    "meaning": "A disproportionate disturbance over something minor.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "ar-seed-0",
+    "language": "ar",
+    "phrase": "بلغ السيل الزبى",
+    "meaning": "A situation has exceeded the limit of endurance; literally floodwater reaching high ground.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "ar-seed-1",
+    "language": "ar",
+    "phrase": "رجع بخفي حنين",
+    "meaning": "To return disappointed and empty-handed; literally to return with Hunayn’s two shoes.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "ar-seed-2",
+    "language": "ar",
+    "phrase": "القشة التي قصمت ظهر البعير",
+    "meaning": "The final small burden that causes an already overloaded situation to collapse; the straw that broke the camel’s back.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "ar-seed-3",
+    "language": "ar",
+    "phrase": "يد واحدة لا تصفق",
+    "meaning": "Cooperation is necessary; one hand alone cannot clap.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "ar-seed-4",
+    "language": "ar",
+    "phrase": "ضرب عصفورين بحجر واحد",
+    "meaning": "To achieve two objectives with one action; to strike two birds with one stone.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "ar-seed-5",
+    "language": "ar",
+    "phrase": "زاد الطين بلة",
+    "meaning": "To make a bad situation worse; to make mud wetter.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "ar-seed-6",
+    "language": "ar",
+    "phrase": "ذر الرماد في العيون",
+    "meaning": "To deceive or obscure the truth; to throw ash in the eyes.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "ar-seed-7",
+    "language": "ar",
+    "phrase": "انقلب السحر على الساحر",
+    "meaning": "A scheme backfires on its maker; the magic turns against the magician.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "ar-seed-8",
+    "language": "ar",
+    "phrase": "ذهب أدراج الرياح",
+    "meaning": "To be lost or come to nothing; to disappear with the winds.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  },
+  {
+    "id": "ar-seed-9",
+    "language": "ar",
+    "phrase": "وضع النقاط على الحروف",
+    "meaning": "To make something clear and precise; to put the dots on the letters.",
+    "imagery": true,
+    "source": "Emotional Atlas starter collection: traditional expressions with original English glosses (see docs/idioms.md)",
+    "license": "MIT — original starter gloss; traditional expression"
+  }
+]

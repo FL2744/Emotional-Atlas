@@ -6,11 +6,13 @@
 
 Emotional Atlas is a native desktop application that uses **OpenAI GPT-6 Luna or a VT ARC model** to infer emotional meaning, identify supporting words and passages, and map paragraphs in an interactive 3D space. It includes text-order animation, PCA views, and resumable analysis sessions in a dark monochrome interface inspired by FENNEC and LAMP, with red-to-blue valence colors reserved for plot points.
 
-[Download macOS v0.5.2](https://github.com/FL2744/Emotional-Atlas/releases/tag/v0.5.2) · [User guide](docs/USER_GUIDE.md) · [Release notes](CHANGELOG.md)
+[Download macOS v0.9.10](https://github.com/FL2744/Emotional-Atlas/releases/tag/v0.9.10) · [Technical report](docs/TECHNICAL_REPORT.md) · [User guide](docs/USER_GUIDE.md) · [Release notes](CHANGELOG.md)
 
 ## Features
 
-- Open UTF-8 `.txt` files or paste text; split by blank lines or individual lines.
+- Open UTF-8 `.txt` files or paste text; split by blank lines or individual lines, with optional sentence-level analysis.
+- Choose Dark or Light beside Method; plot colors remain unchanged.
+- Explore solid/evolving objects, multilingual idiom candidates, and emotional shape transfer with resumable checkpoints.
 - Infer intensity, valence, and inward/outward direction with OpenAI `gpt-6-luna` or a VT ARC model.
 - Inspect emotional components, experiencers, targets, exact evidence, and highlighted signal words.
 - Rotate, zoom, and click paragraphs in the 3D plot; open a synchronized expanded plot at up to twice the display area.
@@ -21,9 +23,9 @@ Emotional Atlas is a native desktop application that uses **OpenAI GPT-6 Luna or
 
 ## Install on macOS
 
-The v0.5.2 binary targets **Apple Silicon (arm64), macOS 15 or later**. The bundled binaries are checked for a macOS 15.0 or earlier deployment target; the packaged app is smoke-tested on macOS 26.6.2. Intel and other operating systems do not have packaged releases yet.
+The v0.9.10 binary targets **Apple Silicon (arm64), macOS 15 or later**. The bundled binaries are checked for a macOS 15.0 or earlier deployment target; the packaged app is smoke-tested on macOS 26.6.2. Intel and other operating systems do not have packaged releases yet.
 
-1. Download `Emotional-Atlas-v0.5.2-macOS-arm64.zip` from the [v0.5.2 release](https://github.com/FL2744/Emotional-Atlas/releases/tag/v0.5.2).
+1. Download `Emotional-Atlas-v0.9.10-macOS-arm64.zip` from the [v0.9.10 release](https://github.com/FL2744/Emotional-Atlas/releases/tag/v0.9.10).
 2. Extract the ZIP and drag **Emotional Atlas.app** into Applications.
 3. Open the app.
 
@@ -68,11 +70,12 @@ These are model-generated interpretations, not validated psychological measureme
 
 ## Run from source
 
-Requires **Python 3.10+ with Tk**. The application itself uses the Python standard library; no third-party runtime packages are required.
+Requires **Python 3.10+ with Tk**. The interface uses Tk; solid geometry requires NumPy and SciPy. Install the pinned runtime dependencies below.
 
 ```bash
 git clone https://github.com/FL2744/Emotional-Atlas.git
 cd Emotional-Atlas
+python3 -m pip install -r requirements.txt
 python3 app.py
 ```
 
@@ -119,3 +122,48 @@ The smoke test opens and closes its own test window and checks the icon, control
 ## License and credits
 
 Application source and artwork: [MIT](LICENSE). Third-party runtimes and the optional Gutenberg text retain their own terms; see [third-party notices](THIRD_PARTY_NOTICES.md). The application icon was generated with OpenAI's image-generation tool.
+
+### Idioms and dream imagery
+
+**Scan idioms / Resume** runs a separate multilingual pass through the selected API.
+It looks for direct uses, transformations and tentative dream-imagery echoes;
+matching paragraph points become yellow. Select a paragraph for the original
+idiom, language, meaning, source quote, explanation and alternative reading.
+Saved sessions retain these annotations. English and Arabic have small starter
+collections; Chinese has 30,895 dictionary records. Import dictionaries to extend
+coverage. See [idiom documentation](docs/idioms.md) for data licenses, coverage,
+request costs, interpretation limits and the import format.
+
+### Solid and evolving objects
+
+Open **Solid / 4D object** for a separate solid visualization: convex outer shell,
+spatial-neighbor envelope, or a tube following paragraph order. Explore cumulative
+growth or moving-window evolution with paragraph order as the fourth dimension.
+Export OBJ meshes, mathematical descriptions, and complete geometry/evolution JSON.
+See [object documentation](docs/objects.md) for definitions, coordinates and limitations.
+
+### Optional sentence-level analysis
+
+Enable **Sentence-level analysis (granular)** beneath Paragraph breaks to score
+each sentence independently. It is off by default. Each sentence becomes one
+plot point and one playback/evolution step; neighboring sentences provide context
+only. Changing granularity starts a separate analysis. Saved sessions retain the
+mode and source text; old sessions default to paragraph mode. Sentence CSV exports
+use a `sentence` ID column; object metadata records `text_unit: sentence`.
+
+Segmentation is local and punctuation-based, supporting `. ! ? ؟ 。 ！ ？`, closing
+quotes, common English abbreviations and decimals. Ambiguous abbreviations, dialogue
+attributions, unusual punctuation and punctuation-free text may need manual edits.
+The displayed unit count helps check segmentation before sending API requests.
+Granular analysis generally produces more units and can increase API usage.
+Legacy JSON field names such as `paragraphs` and `paragraph` remain stable;
+`segmentation` / `text_unit` identify whether those IDs represent sentences.
+
+### Emotional shape transfer
+
+Analyze a source, then open **Emotional shape transfer…** to revise a separate target
+toward its emotional trajectory. Supports paragraph/sentence alignment, transfer
+strength, flexible transformation (default) or strict meaning preservation, bounded attempts, geometry comparisons, and TXT/JSON
+exports. Source geometry is used directly from memory; no export is required.
+Flexible transformation is the default and permits meaning changes; Preserve meaning offers stricter editing. Neither guarantees an exact shape match.
+See [transfer documentation](docs/shape-transfer.md) for workflow, limits and math.

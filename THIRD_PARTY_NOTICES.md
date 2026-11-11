@@ -7,3 +7,18 @@ The application source and project artwork are distributed under the repository'
 - The constellation icon was created with OpenAI's built-in image-generation tool; its generation prompt is in `assets/icon-generation.txt`.
 
 Sources: https://www.python.org/psf/license/ · https://www.tcl-lang.org/software/tcltk/license.html · https://openssl-library.org/source/license/ · https://pyinstaller.org/en/stable/license.html · https://www.gutenberg.org/ebooks/84
+
+## Chinese idiom dictionary
+
+The bundled `datasets/chinese.json` is adapted from PWXCOO's
+[chinese-xinhua](https://github.com/pwxcoo/chinese-xinhua), revision
+`fe6d6c2e8baa82187f4c96bbe042e43f96c05666`. Copyright (c) 2018 PWXCOO,
+MIT license retained in `licenses/chinese-xinhua.txt`. The conversion retains
+idiom forms and definitions, adds identifiers/provenance and ten imagery flags.
+
+## Object geometry dependencies
+
+NumPy 2.5.4 and SciPy 1.17.1 provide numerical arrays and Qhull-based spatial
+geometry. Their distribution license notices, including bundled third-party
+notices, are retained under `licenses/numpy` and `licenses/scipy`.
+See https://numpy.org and https://scipy.org.

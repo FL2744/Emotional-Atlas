@@ -10,7 +10,7 @@ signing_identity = os.environ.get('DEVELOPER_ID_APPLICATION')
 ssl_policy = Path(sysconfig.get_path('stdlib'))/'codex-rejected-cas.pem'
 ssl_data = [(str(ssl_policy), '.')] if ssl_policy.is_file() else []
 a = Analysis([str(root/'app.py')], pathex=[str(root)],
-    binaries=[], datas=[(str(root/'assets/emotion-atlas-icon-small.png'), 'assets'), (str(root/'LICENSE'), '.'),
+    binaries=[], datas=[(str(root/'datasets'), 'datasets'), (str(root/'assets/emotion-atlas-icon-small.png'), 'assets'), (str(root/'LICENSE'), '.'),
                         (str(root/'THIRD_PARTY_NOTICES.md'), '.'), (str(root/'VERSION'), '.'), (str(root/'licenses'), 'licenses')] + ssl_data,
     hiddenimports=[], hookspath=[], hooksconfig={}, runtime_hooks=[], excludes=[], noarchive=False)
 pyz = PYZ(a.pure)

@@ -1,8 +1,8 @@
 # Emotional Atlas
 
-A native Python desktop app for exploring emotional content in dreams and literature using **gpt-6-luna** inference. No web server, browser, or third-party Python packages are required.
+A native Python/Tk desktop app for exploring emotional content in dreams and literature using OpenAI or VT ARC inference. NumPy and SciPy support solid geometry; the packaged macOS app includes its runtime.
 
-The interface uses a retro black and gray background, white monospace text, and hard-edged controls and panels. The app title is blue and its Dreams / Literature / Semantic Inference subtitle is red. The plot retains a dark rectangular canvas with red-to-gray-to-blue valence markers. Slim arrowless scrollbars use rectangular gray thumbs. Native window frames and file/alert dialogs use macOS styling.
+The interface defaults to a dark monochrome palette. Choose Light beside Method for white backgrounds and dark text across all windows. Valence colors, yellow idiom markers and chosen surface colors are preserved. Native window frames and file/alert dialogs use macOS styling.
 
 The generated constellation icon is saved in `assets/emotion-atlas-icon.png`. The app also loads a smaller copy as its window icon where supported.
 
@@ -72,3 +72,13 @@ Run `python3 -m unittest discover -p 'test_*.py' -v` from this directory. Tests 
 Official API references:
 - https://developers.openai.com/api/docs/models/gpt-6-luna
 - https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses
+
+## Additional workflows in v0.9.10
+
+- **Sentence-level analysis (granular)** evaluates sentences instead of paragraphs; it is off by default.
+- **Scan idioms / Resume** adds dictionary-grounded direct, transformed and possible imagery annotations. See the [idiom guide](idioms.md).
+- **Solid / 4D object** opens separate hull, neighbor-envelope or text-order-tube views, with curvature, single-color surfaces and evolution exports. See the [object guide](objects.md).
+- **Emotional shape transfer…** revises a target toward an analyzed source trajectory. Flexible transformation permits meaning changes; Preserve meaning is stricter. Use Save transfer to checkpoint ongoing work, and Open saved transfer… to resume later. See the [transfer guide](shape-transfer.md).
+- Analysis sessions and transfer checkpoints have distinct names and timestamps. API keys are never included. Passage-specific failures are flagged while processing continues; provider/account/transport failures still pause the run.
+
+For architecture, equations, validation evidence and research limitations, read the [technical report by William Taggart](TECHNICAL_REPORT.md).

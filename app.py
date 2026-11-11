@@ -2,6 +2,10 @@
 """Emotional Atlas — native desktop application. Requires Python 3.10+ with Tk."""
 from __future__ import annotations
 import csv
+import appearance
+from appearance import ui_color
+from session_identity import session_identity, session_filename, timestamp
+import idioms
 import io
 import json
 import math
@@ -17,18 +21,22 @@ from analysis import (MODEL, ARC_MODEL, AnalysisError, Cancelled, analyze_resili
 
 BASE = Path(__file__).resolve().parent
 # Dark monochrome interface; valence color is reserved for plotted data.
-BG = '#111113'
-PANEL = '#19191c'
-TEXT = '#f2f2f3'
-MUTED = '#aaaab0'
-BLUE = TEXT
-GOLD = TEXT
-RULE = '#3d3d43'
-PLOT_BG = '#19191c'
-PLOT_TEXT = TEXT
-PLOT_MUTED = '#aaaab0'
-PLOT_GRID = '#303035'
-PLOT_EDGE = '#55555d'
+def update_palette():
+    global BG,PANEL,TEXT,MUTED,BLUE,GOLD,RULE,PLOT_BG,PLOT_TEXT,PLOT_MUTED,PLOT_GRID,PLOT_EDGE
+    BG = ui_color('#111113')
+    PANEL = ui_color('#19191c')
+    TEXT = ui_color('#f2f2f3')
+    MUTED = ui_color('#aaaab0')
+    BLUE = TEXT
+    GOLD = TEXT
+    RULE = ui_color('#3d3d43')
+    PLOT_BG = ui_color('#19191c')
+    PLOT_TEXT = TEXT
+    PLOT_MUTED = ui_color('#aaaab0')
+    PLOT_GRID = ui_color('#303035')
+    PLOT_EDGE = ui_color('#55555d')
+
+update_palette()
 
 
 def color(valence):
@@ -52,6 +60,7 @@ class EmotionPlot(tk.Canvas):
         super().__init__(parent, background=PLOT_BG, highlightthickness=0, height=380, takefocus=True)
         self.on_select = on_select
         self.rows = []
+        self.idiom_ids = set()
         self.mode = "Emotion axes"
         self.pca = fit_pca([])
         self.cutoff = None
@@ -183,12 +192,12 @@ class EmotionPlot(tk.Canvas):
         known = [r for r in revealed if self.coordinate(r) is not None]
         if self.show_trail:
             for a,b in consecutive_segments(known):
-                self.line3(self.coordinate(a),self.coordinate(b), '#666666', 1)
+                self.line3(self.coordinate(a),self.coordinate(b), ui_color('#666666'), 1)
         self.points = []
         projected = [(self.project(self.coordinate(r)),r) for r in known]
         for (x,y,depth),row in sorted(projected,key=lambda item: -item[0][2]):
             size=5 if row['id'] != self.selected else 8
-            self.create_oval(x-size,y-size,x+size,y+size,fill=color(row['valence']),
+            self.create_oval(x-size,y-size,x+size,y+size,fill='#f1d76a' if row['id'] in self.idiom_ids else color(row['valence']),
                              outline=PLOT_TEXT if row['id']==self.selected else PLOT_BG,width=2)
             self.points.append((x,y,depth,row))
             if row['id']==self.selected:
@@ -218,21 +227,24 @@ class Atlas(tk.Tk):
         self.expanded_window=None
         self.expanded_plot=None
         self.paragraphs=[]
-        self.results={};self.reviews={}
+        self.results={};self.reviews={};self.idiom_results={}
+        self.lexicon=idioms.dictionaries()
         self.title_text='Untitled text'
+        self.session_identity=session_identity(self.title_text)
         self.usage={'input_tokens':0,'output_tokens':0}
         self.events=queue.Queue()
         self.cancel=threading.Event()
         self.running=False
         self.dirty=False
         self.mode_used='blank'
+        self.sentence_mode=tk.BooleanVar(value=False)
         self.session_text=''
         self.current_id=None
         self.timeline=Timeline()
         self.playback_timer=None
         self.playback_speed=tk.StringVar(value='2')
         self.playback_position=tk.DoubleVar(value=0)
-        self.playback_label=tk.StringVar(value='All paragraphs visible')
+        self.playback_label=tk.StringVar(value='All segments visible')
         self.trail=tk.BooleanVar(value=False)
         self.plot_mode=tk.StringVar(value='Emotion axes')
         self.pca_signature=None
@@ -242,14 +254,21 @@ class Atlas(tk.Tk):
         self.key=self.api_keys['openai']
         self.session_provider='openai';self.session_model=MODEL
         self.status=tk.StringVar(value='Ready. Add text and your API key to begin.')
-        self.stats=tk.StringVar(value='0 paragraphs  /  0 analyzed')
-        self.filter=tk.StringVar(value='All paragraphs')
+        self.stats=tk.StringVar(value='0 segments  /  0 analyzed')
+        self.filter=tk.StringVar(value='All segments')
         self.mode=tk.StringVar(value='Blank lines')
         self.range_count=tk.StringVar(value='All remaining')
+        self.appearance=tk.StringVar(value='Light' if appearance.light else 'Dark')
         self.configure_styles()
         self.build()
         self.after(100,self.poll)
         self.protocol('WM_DELETE_WINDOW',self.close)
+
+    def change_appearance(self,event=None):
+        was_light=appearance.light
+        appearance.set_light(self.appearance.get()=='Light');update_palette()
+        self.configure_styles()
+        appearance.recolor_widgets(self,was_light)
 
     def configure_styles(self):
         style=ttk.Style(self);style.theme_use('clam')
@@ -266,10 +285,10 @@ class Atlas(tk.Tk):
         style.configure('Heading.TLabel',font=('Helvetica Neue',14,'bold'),foreground=TEXT)
         style.configure('TButton',background=PANEL,foreground=TEXT,padding=(10,7),
                         borderwidth=1,relief='solid')
-        style.map('TButton',background=[('disabled',BG),('pressed','#3b3b43'),('active','#2d2d33')],
-                  foreground=[('disabled','#75757d'),('pressed',TEXT),('active',TEXT)])
-        style.configure('Accent.TButton',background='#35353d',foreground=TEXT)
-        style.map('Accent.TButton',background=[('disabled','#303035'),('pressed','#484851'),('active','#41414a')],
+        style.map('TButton',background=[('disabled',BG),('pressed',ui_color('#3b3b43')),('active',ui_color('#2d2d33'))],
+                  foreground=[('disabled',ui_color('#75757d')),('pressed',TEXT),('active',TEXT)])
+        style.configure('Accent.TButton',background=ui_color('#35353d'),foreground=TEXT)
+        style.map('Accent.TButton',background=[('disabled',ui_color('#303035')),('pressed',ui_color('#484851')),('active',ui_color('#41414a'))],
                   foreground=[('disabled',MUTED),('!disabled',TEXT)])
         style.configure('TEntry',fieldbackground=PANEL,foreground=TEXT,insertcolor=TEXT,
                         padding=8,borderwidth=1)
@@ -277,7 +296,7 @@ class Atlas(tk.Tk):
                         arrowcolor=TEXT,padding=6,borderwidth=1)
         style.map('TCombobox',fieldbackground=[('readonly',PANEL)],
                   foreground=[('disabled',MUTED),('readonly',TEXT)],
-                  background=[('active','#2b2b31')],selectbackground=[('readonly',PANEL)],
+                  background=[('active',ui_color('#2b2b31'))],selectbackground=[('readonly',PANEL)],
                   selectforeground=[('readonly',TEXT)])
         self.option_add('*TCombobox*Listbox.background',PANEL)
         self.option_add('*TCombobox*Listbox.foreground',TEXT)
@@ -287,25 +306,25 @@ class Atlas(tk.Tk):
                         rowheight=30,borderwidth=0)
         style.configure('Treeview.Heading',background=BG,foreground=TEXT,
                         font=('Menlo',10,'bold'),padding=8,relief='solid')
-        style.map('Treeview.Heading',background=[('active','#2b2b31')])
-        style.map('Treeview',background=[('selected','#3c3c46')],foreground=[('selected',TEXT)])
+        style.map('Treeview.Heading',background=[('active',ui_color('#2b2b31'))])
+        style.map('Treeview',background=[('selected',ui_color('#3c3c46'))],foreground=[('selected',TEXT)])
         style.configure('TNotebook',background=BG,borderwidth=0)
         style.configure('TNotebook.Tab',background=BG,foreground=MUTED,padding=(16,9),borderwidth=1)
-        style.map('TNotebook.Tab',background=[('selected','#3c3c46'),('active','#2d2d33')],
+        style.map('TNotebook.Tab',background=[('selected',ui_color('#3c3c46')),('active',ui_color('#2d2d33'))],
                   foreground=[('selected',TEXT),('active',TEXT)])
         style.configure('TCheckbutton',background=BG,foreground=TEXT,
                         indicatorbackground=PANEL,indicatorforeground=TEXT)
         style.map('TCheckbutton',background=[('active',BG)],
                   indicatorbackground=[('selected',TEXT)],indicatorforeground=[('selected',PANEL)])
         style.configure('TSeparator',background=RULE)
-        style.configure('Horizontal.TProgressbar',background=TEXT,troughcolor='#2b2b31',borderwidth=0)
-        style.configure('Horizontal.TScale',background=TEXT,troughcolor='#303035',borderwidth=0)
+        style.configure('Horizontal.TProgressbar',background=TEXT,troughcolor=ui_color('#2b2b31'),borderwidth=0)
+        style.configure('Horizontal.TScale',background=TEXT,troughcolor=ui_color('#303035'),borderwidth=0)
         style.configure('TPanedwindow',background=BG)
         style.layout('Modern.Vertical.TScrollbar',[
             ('Vertical.Scrollbar.trough',{'sticky':'ns','children':[
                 ('Vertical.Scrollbar.thumb',{'sticky':'nswe','expand':True})]})])
         style.configure('Modern.Vertical.TScrollbar',width=10,troughcolor=PANEL,
-                        background='#55555d',borderwidth=0,arrowsize=0,relief='flat')
+                        background=ui_color('#55555d'),borderwidth=0,arrowsize=0,relief='flat')
         style.map('Modern.Vertical.TScrollbar',background=[('pressed',TEXT),('active',MUTED)])
 
     def build(self):
@@ -330,9 +349,21 @@ class Atlas(tk.Tk):
         self.bind('<Button-5>',self.scroll_workspace,add='+')
         self.bind('<FocusIn>',self.reveal_control,add='+')
         top=ttk.Frame(self.workspace,padding=(24,20,24,18)); top.pack(fill='x')
-        ttk.Label(top,text='Emotional Atlas',style='Title.TLabel').pack(side='left')
-        ttk.Label(top,text='DREAMS  /  LITERATURE  /  SEMANTIC INFERENCE',style='Muted.TLabel').pack(side='left',padx=22)
-        ttk.Button(top,text='Method',command=self.method).pack(side='right')
+        heading=ttk.Frame(top);heading.pack(side='left',padx=(0,20))
+        ttk.Label(heading,text='Emotional Atlas',style='Title.TLabel').pack(anchor='w')
+        ttk.Label(heading,text='DREAMS  /  LITERATURE  /  SEMANTIC INFERENCE',style='Muted.TLabel').pack(anchor='w')
+        self.method_btn=ttk.Button(top,text='Method',command=self.method);self.method_btn.pack(side='right')
+        appearance_box=ttk.Combobox(top,textvariable=self.appearance,values=['Dark','Light'],state='readonly',width=7)
+        appearance_box.pack(side='right',padx=(0,12));appearance_box.bind('<<ComboboxSelected>>',self.change_appearance)
+        self.status_display=tk.Text(top,wrap='word',width=42,height=3,
+            background=BG,foreground=TEXT,relief='flat',borderwidth=0,highlightthickness=0,
+            padx=0,pady=8,font=('Helvetica Neue',11),state='disabled',cursor='arrow')
+        self.status_display.pack(side='right',fill='x',expand=True,padx=(0,14))
+        def show_status(*args):
+            self.status_display.configure(state='normal')
+            self.status_display.delete('1.0','end');self.status_display.insert('1.0',self.status.get())
+            self.status_display.configure(state='disabled');self.status_display.yview_moveto(0)
+        self.status.trace_add('write',show_status);show_status()
         ttk.Separator(self.workspace).pack(fill='x',padx=24,pady=(0,18))
         outer=ttk.Panedwindow(self.workspace,orient='horizontal'); outer.pack(fill='both',expand=True,padx=18)
         left=ttk.Frame(outer,width=360,padding=(0,0,16,0)); outer.add(left,weight=0)
@@ -340,10 +371,12 @@ class Atlas(tk.Tk):
         ttk.Label(left,text='01  Source text',style='Heading.TLabel').pack(anchor='w',pady=(4,12))
         row=ttk.Frame(left); row.pack(fill='x')
         self.open_btn=ttk.Button(row,text='Open .txt',command=self.open_text);self.open_btn.pack(side='left')
+        self.load_btn=ttk.Button(row,text='Open session',command=self.open_session);self.load_btn.pack(side='left',padx=(6,0))
+        ttk.Button(row,text='Save session',command=self.save_session).pack(side='left',padx=(6,0))
         ttk.Label(left,text='Or paste a dream or passage below.',style='Muted.TLabel').pack(anchor='w',pady=(12,6))
         source_card=ttk.Frame(left,style='Card.TFrame');source_card.pack(fill='x')
         self.source=tk.Text(source_card,wrap='word',width=38,height=8,background=PANEL,foreground=TEXT,
-            insertbackground=TEXT,selectbackground='#44444e',selectforeground='#f2f2f3',highlightthickness=0,relief='flat',padx=12,pady=12,font=('Helvetica Neue',13),spacing1=3,spacing3=8,undo=True)
+            insertbackground=TEXT,selectbackground=ui_color('#44444e'),selectforeground=ui_color('#f2f2f3'),highlightthickness=0,relief='flat',padx=12,pady=12,font=('Helvetica Neue',13),spacing1=3,spacing3=8,undo=True)
         source_scroll=ttk.Scrollbar(source_card,orient='vertical',style='Modern.Vertical.TScrollbar',command=self.source.yview)
         source_scroll.pack(side='right',fill='y',padx=(5,0))
         self.source.configure(yscrollcommand=source_scroll.set)
@@ -353,6 +386,8 @@ class Atlas(tk.Tk):
         ttk.Label(opts,text='Paragraph breaks',style='Muted.TLabel').pack(side='left')
         self.mode_box=ttk.Combobox(opts,textvariable=self.mode,values=['Blank lines','Every line'],state='readonly',width=12)
         self.mode_box.pack(side='right');self.mode_box.bind('<<ComboboxSelected>>',lambda e:self.update_count())
+        self.sentence_check=ttk.Checkbutton(left,text='Sentence-level analysis (granular)',variable=self.sentence_mode,command=self.update_count)
+        self.sentence_check.pack(anchor='w',pady=(0,6))
         ttk.Label(left,textvariable=self.stats,style='Muted.TLabel').pack(anchor='w')
         ttk.Separator(left).pack(fill='x',pady=15)
         ttk.Label(left,text='02  Inference',style='Heading.TLabel').pack(anchor='w',pady=(0,10))
@@ -377,10 +412,17 @@ class Atlas(tk.Tk):
         self.run_btn=ttk.Button(run,text='Analyze / Resume',style='Accent.TButton',command=self.start);self.run_btn.pack(side='left',fill='x',expand=True)
         self.stop_btn=ttk.Button(run,text='Stop',command=self.stop,state='disabled');self.stop_btn.pack(side='left',padx=(8,0))
         ttk.Separator(left).pack(fill='x',pady=14)
-        exports=ttk.Frame(left);exports.pack(fill='x')
-        ttk.Button(exports,text='Save session',command=self.save_session).pack(side='left')
-        self.load_btn=ttk.Button(exports,text='Open session',command=self.open_session);self.load_btn.pack(side='left',padx=6)
+        self.idiom_btn=ttk.Button(left,text='Scan idioms / Resume',command=self.start_idioms)
+        self.idiom_btn.pack(fill='x')
+        self.dictionary_btn=ttk.Button(left,text='Import idiom dictionary',command=self.import_idioms)
+        self.dictionary_btn.pack(fill='x',pady=(6,0))
+        self.rescan_btn=ttk.Button(left,text='Rescan all idioms',command=lambda:self.start_idioms(rescan=True))
+        self.rescan_btn.pack(fill='x',pady=(6,0))
+        ttk.Label(left,text='English · Arabic · Chinese · Dream imagery\nPossible echoes appear in yellow. Uses your selected API.\nEnglish/Arabic coverage is a small starter collection.',style='Muted.TLabel',wraplength=330).pack(anchor='w',pady=8)
+
         ttk.Button(left,text='Export scores to CSV',command=self.save_csv).pack(fill='x',pady=(8,0))
+        ttk.Button(left,text='Emotional shape transfer…',command=self.open_shape_transfer).pack(fill='x',pady=(8,0))
+        ttk.Button(left,text='Open saved transfer…',command=self.open_saved_transfer).pack(fill='x',pady=(4,0))
         header=ttk.Frame(right);header.pack(fill='x',pady=(4,8))
         ttk.Label(header,text='03  Emotional landscape',style='Heading.TLabel').pack(side='left')
         ttk.Button(header,text='Reset view',command=lambda:self.plot.reset()).pack(side='right')
@@ -392,6 +434,7 @@ class Atlas(tk.Tk):
         view.pack(side='left');view.bind('<<ComboboxSelected>>',lambda e:self.change_plot_mode())
         ttk.Button(view_controls,text='PCA details',command=self.show_pca_details).pack(side='left',padx=6)
         ttk.Button(view_controls,text='Export PCA',command=self.export_pca).pack(side='left')
+        ttk.Button(view_controls,text='Solid / 4D object',command=self.open_object_view).pack(side='left',padx=6)
         self.plot=EmotionPlot(right,self.select);self.plot.pack(fill='both',expand=True)
         self.plot.on_draw=self.sync_expanded_plot
 
@@ -399,13 +442,13 @@ class Atlas(tk.Tk):
         ttk.Label(legend,text='− Negative / red',foreground=TEXT).pack(side='left',padx=8)
         ttk.Label(legend,text='0 Neutral / gray',foreground=MUTED).pack(side='left',padx=8)
         ttk.Label(legend,text='+ Positive / blue',foreground=TEXT).pack(side='left',padx=8)
-        ttk.Label(legend,text='One point = one paragraph',style='Muted.TLabel').pack(side='right',padx=10)
+        ttk.Label(legend,text='Yellow = possible idiom · One point = one text segment',style='Muted.TLabel').pack(side='right',padx=10)
         playback=ttk.Frame(right);playback.pack(fill='x',pady=(4,4))
         self.play_btn=ttk.Button(playback,text='▶ Play',command=self.toggle_playback)
         self.play_btn.pack(side='left')
         ttk.Button(playback,text='↺ Restart',command=self.restart_playback).pack(side='left',padx=5)
         ttk.Button(playback,text='Show all',command=self.show_all_points).pack(side='left')
-        ttk.Label(playback,text='Paragraphs / sec',style='Muted.TLabel').pack(side='left',padx=(14,5))
+        ttk.Label(playback,text='Segments / sec',style='Muted.TLabel').pack(side='left',padx=(14,5))
         speed=ttk.Combobox(playback,textvariable=self.playback_speed,values=['0.25','0.5','1','2','5','10'],state='readonly',width=5)
         speed.pack(side='left');speed.bind('<<ComboboxSelected>>',lambda e:self.reschedule_playback())
         ttk.Checkbutton(playback,text='Connect neighbors',variable=self.trail,command=self.update_trail).pack(side='right')
@@ -414,12 +457,12 @@ class Atlas(tk.Tk):
         self.position_scale.pack(side='left',fill='x',expand=True,padx=(0,10))
         ttk.Label(position,textvariable=self.playback_label,style='Muted.TLabel',width=43).pack(side='right')
         notebook=ttk.Notebook(right);notebook.pack(fill='both',expand=True,pady=(4,0))
-        table_frame=ttk.Frame(notebook);notebook.add(table_frame,text='Paragraphs')
+        table_frame=ttk.Frame(notebook);notebook.add(table_frame,text='Text segments')
         detail_frame=ttk.Frame(notebook);notebook.add(detail_frame,text='Evidence & decomposition')
         self.notebook=notebook
         controls=ttk.Frame(table_frame);controls.pack(fill='x',pady=7)
         ttk.Label(controls,text='Show',style='Muted.TLabel').pack(side='left',padx=6)
-        filters=ttk.Combobox(controls,textvariable=self.filter,values=['All paragraphs','Positive','Negative','Mixed','Uncertain direction','Needs review','Not analyzed'],state='readonly',width=21)
+        filters=ttk.Combobox(controls,textvariable=self.filter,values=['All segments','Idiom candidates','Positive','Negative','Mixed','Uncertain direction','Needs review','Not analyzed'],state='readonly',width=21)
         filters.pack(side='left');filters.bind('<<ComboboxSelected>>',lambda e:self.refresh())
         ttk.Button(controls,text='Inspect selected →',command=self.inspect).pack(side='right')
         columns=('id','emotion','intensity','valence','direction','uncertainty')
@@ -432,16 +475,15 @@ class Atlas(tk.Tk):
         self.tree.bind('<<TreeviewSelect>>',self.tree_select);self.tree.bind('<Double-1>',lambda e:self.inspect())
         detail_card=ttk.Frame(detail_frame,style='Card.TFrame');detail_card.pack(fill='both',expand=True,pady=6)
         self.detail=tk.Text(detail_card,wrap='word',height=12,background=PANEL,foreground=TEXT,
-            relief='flat',highlightthickness=0,selectbackground='#44444e',selectforeground='#f2f2f3',padx=8,pady=6,font=('Helvetica Neue',13),spacing3=6,state='disabled')
+            relief='flat',highlightthickness=0,selectbackground=ui_color('#44444e'),selectforeground=ui_color('#f2f2f3'),padx=8,pady=6,font=('Helvetica Neue',13),spacing3=6,state='disabled')
         detail_scroll=ttk.Scrollbar(detail_card,orient='vertical',style='Modern.Vertical.TScrollbar',command=self.detail.yview);detail_scroll.pack(side='right',fill='y')
         self.detail.configure(yscrollcommand=detail_scroll.set);self.detail.pack(fill='both',expand=True)
         self.detail.tag_configure('heading',font=('Helvetica Neue',15,'bold'),foreground=BLUE,spacing1=12,spacing3=8)
         self.detail.tag_configure('muted',foreground=MUTED,spacing3=8)
-        self.detail.tag_configure('signal',background='#44444e',foreground='#f2f2f3')
+        self.detail.tag_configure('signal',background=ui_color('#44444e'),foreground=ui_color('#f2f2f3'))
         self.detail.tag_configure('quote',foreground=GOLD,spacing1=4,spacing3=6)
         foot=ttk.Frame(self.workspace,padding=(20,9));foot.pack(fill='x')
         self.progress=ttk.Progressbar(foot,mode='determinate',length=170);self.progress.pack(side='right')
-        ttk.Label(foot,textvariable=self.status,style='Muted.TLabel',wraplength=1040).pack(side='left')
 
     def update_provider(self,event=None):
         arc=self.provider.get()=='VT ARC'
@@ -514,12 +556,14 @@ class Atlas(tk.Tk):
     def update_count(self):
         raw=self.source.get('1.0','end-1c')
         parts=split_paragraphs(raw,self.mode_code())
-        n=len(self.results) if parts==self.paragraphs else 0
-        self.stats.set(f'{len(parts):,} paragraphs  /  {n:,} analyzed')
-        if self.results and parts!=self.paragraphs and not self.running:
-            self.status.set('Source changed. Displayed results belong to the previous text; Analyze will start a new session.')
+        n=len(self.results) if parts==self.paragraphs and self.mode_code()==self.mode_used else 0
+        unit='sentences' if self.sentence_mode.get() else 'paragraphs'
+        self.stats.set(f'{len(parts):,} {unit}  /  {n:,} analyzed')
+        if (self.results or self.idiom_results) and (parts!=self.paragraphs or self.mode_code()!=self.mode_used) and not self.running:
+            self.status.set('Source or analysis granularity changed. Displayed results belong to the previous text; Analyze will start a new session.')
 
     def mode_code(self):
+        if self.sentence_mode.get():return 'sentence'
         return 'blank' if self.mode.get()=='Blank lines' else 'line'
 
     def confirm_replace(self):
@@ -527,12 +571,17 @@ class Atlas(tk.Tk):
             return messagebox.askyesno('Unsaved analysis','Replace the current analysis? Save a session first if you want to keep it.',parent=self)
         return True
 
+    def update_session_title(self):
+        self.title('Emotional Atlas v'+(BASE/'VERSION').read_text().strip()+' — '+self.session_identity['session_name'])
+
     def set_source(self,text,title):
         self.pause_playback()
         self.timeline.reset()
         self.source.configure(state='normal');self.source.delete('1.0','end');self.source.insert('1.0',text)
-        self.paragraphs=split_paragraphs(text,self.mode_code());self.results={};self.reviews={};self.current_id=None
+        self.mode_used=self.mode_code()
+        self.paragraphs=split_paragraphs(text,self.mode_code());self.results={};self.reviews={};self.idiom_results={};self.current_id=None
         self.session_text=text;self.title_text=title;self.usage={'input_tokens':0,'output_tokens':0};self.dirty=False
+        self.session_identity=session_identity(title);self.update_session_title()
         self.refresh();self.status.set(f'Loaded {title}. Ready for analysis.')
 
     def open_text(self):
@@ -551,18 +600,20 @@ class Atlas(tk.Tk):
         if not key:messagebox.showinfo('API key needed',f'Enter your {self.provider.get()} API key. It stays in memory and is never included in exports.');return
         paragraphs=split_paragraphs(self.source.get('1.0','end-1c'),self.mode_code())
         if not paragraphs:messagebox.showinfo('Add text','Paste text or open a UTF-8 .txt file first.');return
-        if paragraphs!=self.paragraphs:
+        if paragraphs!=self.paragraphs or self.mode_code()!=self.mode_used:
             if not self.confirm_replace():return
             self.pause_playback();self.timeline.reset()
-            self.results={};self.reviews={};self.usage={'input_tokens':0,'output_tokens':0};self.dirty=False;self.current_id=None
-            self.paragraphs=paragraphs
+            self.results={};self.reviews={};self.idiom_results={};self.usage={'input_tokens':0,'output_tokens':0};self.dirty=False;self.current_id=None
+            self.paragraphs=paragraphs;self.mode_used=self.mode_code();self.session_text=self.source.get('1.0','end-1c')
             self.title_text='Custom text'
+            self.session_identity=session_identity(self.title_text);self.update_session_title()
         if (self.results or self.reviews) and (provider,model)!=(self.session_provider,self.session_model):
             if not messagebox.askyesno('Start a new analysis?',
                 'Changing provider or model starts a new analysis to keep scores consistent. Save the current session first if you want to keep it. Start over?'):return
             self.pause_playback();self.timeline.reset()
             self.results={};self.reviews={};self.usage={'input_tokens':0,'output_tokens':0};self.current_id=None
             self.dirty=True
+            self.session_identity=session_identity(self.title_text);self.update_session_title()
         self.session_provider=provider;self.session_model=model
         try:groups=list(batches(self.paragraphs,self.results))
         except AnalysisError as e:messagebox.showerror('Text needs paragraph breaks',str(e));return
@@ -573,23 +624,67 @@ class Atlas(tk.Tk):
                 if count>=maximum:break
                 group=group[:maximum-count];limited.append(group);count+=len(group)
             groups=limited
-        if not groups:self.status.set('All paragraphs have already been analyzed.');return
+        if not groups:self.status.set('All segments have already been analyzed.');return
         self.cancel.clear();self.running=True;self.set_running(True);self.refresh()
-        self.status.set(f'Analyzing {sum(len(g) for g in groups)} paragraphs using {model} ({self.provider.get()})…')
+        self.status.set(f'Analyzing {sum(len(g) for g in groups)} text segments using {model} ({self.provider.get()})…')
         def worker():
             review_count=0
             try:
                 for group in groups:
                     if self.cancel.is_set():break
-                    self.events.put(('status',f"Inferring paragraphs {group[0]['id']}–{group[-1]['id']} with {model}…"))
+                    self.events.put(('status',f"Inferring text segments {group[0]['id']}–{group[-1]['id']} with {model}…"))
                     for event in analyze_resilient_batch(group,key,self.cancel,lambda s:self.events.put(('status',s)),provider=provider,model=model):
                         if event[0]=='review':review_count+=1
                         self.events.put(event)
-                self.events.put(('done','Stopped. Completed results retained; Analyze / Resume continues.' if self.cancel.is_set() else f'Run finished. {review_count} paragraph(s) need review; verified results retained. Save a session to keep the results.'))
+                self.events.put(('done','Stopped. Completed results retained; Analyze / Resume continues.' if self.cancel.is_set() else f'Run finished. {review_count} text segment(s) need review; verified results retained. Save a session to keep the results.'))
             except Cancelled:self.events.put(('done','Stopped. Completed results retained.'))
             except Exception as e:
                 message=str(e) if isinstance(e,AnalysisError) else 'Analysis stopped due to an unexpected response. Completed results are retained.'
                 self.events.put(('error',message))
+        threading.Thread(target=worker,daemon=True).start()
+
+    def import_idioms(self):
+        path=filedialog.askopenfilename(filetypes=[('Idiom dictionary','*.json')])
+        if not path:return
+        try:
+            entries=idioms.read_dictionary(path)
+            existing={r['id'] for r in self.lexicon}
+            if existing.intersection(r['id'] for r in entries):raise AnalysisError('Imported dictionary IDs overlap the current dictionary. Use unique IDs.')
+            self.lexicon.extend(entries)
+            # Previously empty scans must be eligible again after expanding coverage.
+            self.idiom_results={i:r for i,r in self.idiom_results.items() if r['matches']}
+            self.dirty=True;self.refresh()
+            self.status.set(f'Imported {len(entries)} idioms for this session. Use Rescan all idioms to include the new dictionary. Reopen the dictionary after restarting the app.')
+        except (OSError,ValueError,AnalysisError) as e:messagebox.showerror('Cannot import dictionary',str(e))
+
+    def start_idioms(self,rescan=False):
+        if self.running:return
+        key=self.key.get().strip()
+        if not key:messagebox.showinfo('API key needed','Enter your selected provider’s API key to scan idioms.');return
+        provider='arc' if self.provider.get()=='VT ARC' else 'openai'
+        model=self.arc_model.get().strip() if provider=='arc' else MODEL
+        if not model:messagebox.showinfo('Model needed','Enter an ARC model ID.');return
+        parts=split_paragraphs(self.source.get('1.0','end-1c'),self.mode_code())
+        if not parts:messagebox.showinfo('Add text','Paste a dream or passage first.');return
+        if parts!=self.paragraphs or self.mode_code()!=self.mode_used:
+            if not self.confirm_replace():return
+            self.set_source(self.source.get('1.0','end-1c'),'Custom text')
+        pending=[(i,t) for i,t in enumerate(self.paragraphs,1) if rescan or i not in self.idiom_results]
+        maximum={'First 12 remaining':12,'First 60 remaining':60}.get(self.range_count.get())
+        if maximum:pending=pending[:maximum]
+        if not pending:self.status.set('All segments have been scanned for idioms.');return
+        records=list(self.lexicon)
+        self.cancel.clear();self.running=True;self.set_running(True)
+        def worker():
+            try:
+                for index,text in pending:
+                    if self.cancel.is_set():break
+                    self.events.put(('status',f'Scanning idioms and imagery in text segment {index} with {model}…'))
+                    matches,usage=idioms.scan(text,records,key,self.cancel,provider=provider,model=model)
+                    self.events.put(('idioms',(index,{'matches':matches,'provider':provider,'model':model},usage)))
+                self.events.put(('done','Idiom scan stopped; completed results retained.' if self.cancel.is_set() else 'Idiom scan complete. Select a paragraph for possible echoes and evidence. Save a session to retain them.'))
+            except Cancelled:self.events.put(('done','Idiom scan stopped; completed results retained.'))
+            except Exception as e:self.events.put(('error',str(e) if isinstance(e,AnalysisError) else 'Idiom scan stopped after an unexpected response. Resume to retry.'))
         threading.Thread(target=worker,daemon=True).start()
 
     def stop(self):
@@ -598,8 +693,9 @@ class Atlas(tk.Tk):
 
     def set_running(self,running):
         state='disabled' if running else 'normal'
-        for btn in (self.open_btn,self.run_btn,self.load_btn):btn.configure(state=state)
+        for btn in (self.open_btn,self.run_btn,self.load_btn,self.idiom_btn,self.dictionary_btn,self.rescan_btn):btn.configure(state=state)
         self.source.configure(state=state);self.key_entry.configure(state=state)
+        self.sentence_check.configure(state=state)
         self.provider_box.configure(state='disabled' if running else 'readonly')
         self.arc_model_box.configure(state=state)
         self.mode_box.configure(state='disabled' if running else 'readonly')
@@ -620,6 +716,11 @@ class Atlas(tk.Tk):
                         self.usage[k]+=usage.get(k,0)
                     if self.current_id is None and rows:self.current_id=rows[0]['id']
                     self.refresh()
+                elif kind=='idioms':
+                    index,row,usage=value;self.idiom_results[index]=row;self.dirty=True
+                    for k in ('input_tokens','output_tokens'):self.usage[k]+=usage.get(k,0)
+                    if self.current_id is None:self.current_id=index
+                    self.refresh()
                 elif kind=='review':
                     index,reason=value;self.reviews[index]=reason;self.dirty=True
                     self.refresh()
@@ -631,7 +732,8 @@ class Atlas(tk.Tk):
 
     def visible(self,index,result):
         selected=self.filter.get()
-        if selected=='All paragraphs':return True
+        if selected=='All segments':return True
+        if selected=='Idiom candidates':return bool(self.idiom_results.get(index,{}).get('matches'))
         if selected=='Needs review':return index in self.reviews
         if selected=='Not analyzed':return result is None
         if not result:return False
@@ -649,6 +751,8 @@ class Atlas(tk.Tk):
                 labels=', '.join(e['label'] for e in r['emotions']) or 'No emotion conveyed'
                 values=(i,labels,number(r['intensity']),number(r['valence'],True),r['direction_status'],r['uncertainty'])
             else:values=(i,'Needs review' if i in self.reviews else 'Not analyzed','—','—','—','—')
+            if self.idiom_results.get(i,{}).get('matches'):
+                values=(values[0],values[1]+' · Possible idiom',*values[2:])
             self.tree.insert('', 'end',iid=str(i),values=values)
         self.timeline.total=len(self.paragraphs)
         self.position_scale.configure(to=max(1,len(self.paragraphs)))
@@ -656,10 +760,12 @@ class Atlas(tk.Tk):
         if signature != self.pca_signature:
             if self.timeline.playing and self.plot.mode != 'Emotion axes':self.pause_playback()
             self.plot.pca=fit_pca(list(self.results.values()));self.pca_signature=signature
+        self.plot.idiom_ids={i for i,r in self.idiom_results.items() if r['matches']}
         self.plot.rows=rows;self.plot.selected=self.current_id
         self.plot.cutoff=self.timeline.position;self.plot.draw()
         self.update_playback_label()
-        self.stats.set(f'{len(self.paragraphs):,} paragraphs  /  {len(self.results):,} analyzed  /  {len(self.reviews)} need review')
+        unit='sentences' if self.mode_used=='sentence' else 'paragraphs'
+        self.stats.set(f'{len(self.paragraphs):,} {unit}  /  {len(self.results):,} analyzed  /  {len(self.reviews)} need review')
         self.progress.configure(maximum=max(1,len(self.paragraphs)),value=len(self.results))
         if self.current_id:
             if self.tree.exists(str(self.current_id)):self.tree.selection_set(str(self.current_id))
@@ -684,6 +790,22 @@ class Atlas(tk.Tk):
             self.tree.selection_set(str(index));self.tree.see(str(index))
         self.plot.selected=index;self.plot.draw();self.show_detail(index);self.notebook.select(1)
 
+    def open_shape_transfer(self):
+        from transfer_view import open_transfer
+        return open_transfer(self,EmotionPlot)
+
+    def open_saved_transfer(self):
+        from transfer_view import open_saved_transfer
+        return open_saved_transfer(self,EmotionPlot)
+
+    def open_object_view(self):
+        try:
+            from object_view import open_object_view
+        except ImportError:
+            messagebox.showerror('Geometry dependencies needed','Install the packages in requirements.txt using the Python environment running this app.',parent=self)
+            return
+        return open_object_view(self,EmotionPlot)
+
     def toggle_expanded_plot(self):
         if self.expanded_window is not None:
             self.close_expanded_plot();return
@@ -701,13 +823,27 @@ class Atlas(tk.Tk):
         ttk.Button(toolbar,text='Restore plot',command=self.close_expanded_plot).pack(side='right')
         ttk.Button(toolbar,text='Play / Pause',command=self.toggle_playback).pack(side='right',padx=5)
         ttk.Button(toolbar,text='Reset view',command=lambda:self.expanded_plot.reset()).pack(side='right')
-        self.expanded_plot=EmotionPlot(win,self.select)
+        self.expanded_panes=tk.PanedWindow(win,orient='vertical',background=RULE,
+            borderwidth=0,sashwidth=9,showhandle=True,handlesize=8,opaqueresize=True)
+        self.expanded_panes.pack(fill='both',expand=True)
+        self.expanded_plot=EmotionPlot(self.expanded_panes,self.select)
         self.expanded_plot.configure(width=width,height=height)
-        self.expanded_plot.pack(fill='both',expand=True)
+        self.expanded_panes.add(self.expanded_plot,minsize=160,stretch='always')
         self.expanded_plot.yaw,self.expanded_plot.pitch,self.expanded_plot.zoom=self.plot.yaw,self.plot.pitch,self.plot.zoom
-        footer=ttk.Frame(win,padding=(12,8));footer.pack(fill='x')
+        footer=ttk.Frame(self.expanded_panes,padding=(12,8))
+        self.expanded_panes.add(footer,minsize=90,stretch='never')
+        caption_bar=ttk.Frame(footer);caption_bar.pack(fill='x',pady=(0,6))
+        ttk.Label(caption_bar,text='Selected text · Drag the divider above to resize',style='Muted.TLabel').pack(side='left')
+        self.expanded_text_large=False
+        self.expanded_text_btn=ttk.Button(caption_bar,text='Expand text',command=self.toggle_expanded_text)
+        self.expanded_text_btn.pack(side='right')
+        text_card=ttk.Frame(footer);text_card.pack(fill='both',expand=True)
+        self.expanded_text=tk.Text(text_card,wrap='word',height=6,background=PANEL,foreground=TEXT,
+            relief='flat',highlightthickness=0,padx=10,pady=8,font=('Helvetica Neue',13),state='disabled')
+        scroll=ttk.Scrollbar(text_card,orient='vertical',command=self.expanded_text.yview)
+        scroll.pack(side='right',fill='y');self.expanded_text.configure(yscrollcommand=scroll.set)
+        self.expanded_text.pack(fill='both',expand=True)
         self.expanded_caption=tk.StringVar(value='')
-        ttk.Label(footer,textvariable=self.expanded_caption,wraplength=max(200,width-30),style='Muted.TLabel').pack(anchor='w')
         self.expand_btn.configure(text='Restore plot')
         self.sync_expanded_plot()
 
@@ -716,14 +852,27 @@ class Atlas(tk.Tk):
         target=self.expanded_plot
         if target.mode != self.plot.mode:
             target.yaw,target.pitch,target.zoom=self.plot.yaw,self.plot.pitch,self.plot.zoom
-        for attr in ('rows','cutoff','show_trail','selected','mode','pca'):
+        for attr in ('rows','cutoff','show_trail','selected','mode','pca','idiom_ids'):
             setattr(target,attr,getattr(self.plot,attr))
         target.draw()
         index=self.plot.selected
         if index and 1<=index<=len(self.paragraphs):
             excerpt=self.paragraphs[index-1]
-            self.expanded_caption.set(f'¶ {index}: '+excerpt[:240]+('…' if len(excerpt)>240 else ''))
-        else:self.expanded_caption.set('Drag to rotate · Scroll to zoom · Click a point for its paragraph. Full evidence appears in the main window.')
+            caption=f'¶ {index}: '+excerpt
+        else:caption='Drag to rotate · Scroll to zoom · Click a point for its paragraph. Full evidence appears in the main window.'
+        if caption!=self.expanded_caption.get():
+            self.expanded_caption.set(caption)
+            self.expanded_text.configure(state='normal');self.expanded_text.delete('1.0','end')
+            self.expanded_text.insert('1.0',caption);self.expanded_text.configure(state='disabled')
+            self.expanded_text.yview_moveto(0)
+
+    def toggle_expanded_text(self):
+        if self.expanded_window is None:return
+        self.expanded_text_large=not self.expanded_text_large
+        self.expanded_panes.update_idletasks()
+        height=self.expanded_panes.winfo_height()
+        self.expanded_panes.sash_place(0,0,max(160,round(height*(.45 if self.expanded_text_large else .78))))
+        self.expanded_text_btn.configure(text='More plot space' if self.expanded_text_large else 'Expand text')
 
     def close_expanded_plot(self):
         win=self.expanded_window
@@ -798,7 +947,7 @@ class Atlas(tk.Tk):
         position=self.timeline.position
         self.playback_position.set(self.timeline.total if position is None else position)
         if position is None:
-            self.playback_label.set('All paragraphs visible');return
+            self.playback_label.set('All segments visible');return
         label=f'¶ {position} / {self.timeline.total}'
         if position:
             r=self.results.get(position)
@@ -822,7 +971,7 @@ class Atlas(tk.Tk):
         else:
             self.tree.selection_remove(*self.tree.selection())
             self.detail.configure(state='normal');self.detail.delete('1.0','end')
-            self.detail.insert('end','Playback begins before paragraph 1.','muted')
+            self.detail.insert('end','Playback begins before text segment 1.','muted')
             self.detail.configure(state='disabled')
 
     def inspect(self):
@@ -830,7 +979,7 @@ class Atlas(tk.Tk):
 
     def show_detail(self,index):
         self.detail.configure(state='normal');self.detail.delete('1.0','end')
-        self.detail.insert('end',f'Paragraph {index}\n','heading')
+        self.detail.insert('end',f"{'Sentence' if self.mode_used=='sentence' else 'Paragraph'} {index}\n",'heading')
         r=self.results.get(index)
         if r:
             self.detail.insert('end',f"Intensity {number(r['intensity'])}  ·  Valence {number(r['valence'],True)}  ·  Direction {number(r['direction'],True)} ({r['direction_status']})\n",'muted')
@@ -868,15 +1017,32 @@ class Atlas(tk.Tk):
                     self.detail.insert('end','Signals: '+', '.join(evidence['signal_words'])+'\n','muted')
                     self.detail.insert('end',evidence['explanation']+'\n')
         else:self.detail.insert('end',self.reviews.get(index,'This paragraph has not been analyzed.'),'muted')
+        scan=self.idiom_results.get(index)
+        if scan is not None:
+            self.detail.insert('end','\n\nIdioms and possible imagery echoes\n','heading')
+            self.detail.insert('end',f"Scanned with {scan['model']} ({scan['provider']}).\n",'muted')
+            if not scan['matches']:self.detail.insert('end','No dictionary-backed candidates found. Coverage is incomplete.\n','muted')
+            for match in scan['matches']:
+                entry=match['entry']
+                label={'direct':'Possible direct use','transformed':'Possible transformed use','imagery':'Possible dream / imagery echo'}[match['kind']]
+                self.detail.insert('end',f"{entry['phrase']} [{entry['language']}] — {label}\n",'heading')
+                self.detail.insert('end',entry['meaning']+'\n')
+                self.detail.insert('end','“'+match['quote']+'”\n','quote')
+                self.detail.insert('end',match['explanation']+'\n')
+                self.detail.insert('end','Alternative reading: '+match['alternative']+'\n','muted')
+                self.detail.insert('end',f"Source: {entry['source']}\nLicense: {entry['license']}\n\n",'muted')
+            self.detail.insert('end','Imagery echoes are interpretive possibilities, not established dream meanings. Yellow markers require existing emotional plot coordinates.\n','muted')
         self.detail.configure(state='disabled')
 
     def save_session(self):
         if not self.paragraphs:messagebox.showinfo('Nothing to save','Analyze some text first.');return
-        path=filedialog.asksaveasfilename(defaultextension='.json',initialfile='emotion-atlas-session.json',filetypes=[('Atlas session','*.json')])
+        path=filedialog.asksaveasfilename(defaultextension='.json',initialfile=session_filename(self.session_identity,timestamp()),filetypes=[('Atlas session','*.json')])
         if path:
             try:
-                Path(path).write_text(json.dumps(export_session(self.paragraphs,self.results,self.title_text,self.usage,self.reviews,provider=self.session_provider,model=self.session_model),ensure_ascii=False,indent=2),encoding='utf-8')
-                self.dirty=False;self.status.set('Session saved with source text and evidence. API key was not saved.')
+                data=export_session(self.paragraphs,self.results,self.title_text,self.usage,self.reviews,provider=self.session_provider,model=self.session_model,segmentation=self.mode_used,source_text=self.session_text,identity=self.session_identity)
+                data['idioms']={'version':idioms.VERSION,'paragraphs':self.idiom_results}
+                Path(path).write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
+                self.dirty=False;self.update_session_title();self.status.set(f"Saved {Path(path).name} · {data['saved_at']}")
             except OSError as e:messagebox.showerror('Save failed',str(e))
 
     def open_session(self):
@@ -885,18 +1051,23 @@ class Atlas(tk.Tk):
         if not path:return
         try:
             data=json.loads(Path(path).read_text(encoding='utf-8'));paragraphs,results=load_session(data)
-            self.mode.set('Blank lines');self.set_source('\n\n'.join(paragraphs),str(data.get('title','Imported session')))
+            saved_idioms=idioms.restore(data.get('idioms'),paragraphs)
+            segmentation=data.get('segmentation','blank')
+            self.sentence_mode.set(segmentation=='sentence');self.mode.set('Every line' if segmentation=='line' else 'Blank lines')
+            self.set_source(data.get('source_text') or '\n\n'.join(paragraphs),str(data.get('title','Imported session')))
+            self.session_identity=session_identity(self.title_text,data);self.update_session_title()
+            self.paragraphs=paragraphs;self.mode_used=segmentation
             self.session_provider=data.get('provider','openai');self.session_model=data.get('model',MODEL)
             self.provider.set('VT ARC' if self.session_provider=='arc' else 'OpenAI')
             if self.session_provider=='arc':self.arc_model.set(self.session_model)
             self.update_provider()
-            self.results=results
+            self.results=results;self.idiom_results=saved_idioms
             reviews=data.get('reviews',{})
             self.reviews={int(k):v for k,v in reviews.items() if isinstance(k,str) and k.isdigit() and 1<=int(k)<=len(paragraphs) and int(k) not in results and isinstance(v,str)} if isinstance(reviews,dict) else {}
             usage=data.get('usage',{})
             self.usage={k:usage.get(k,0) if type(usage.get(k,0)) is int and usage.get(k,0)>=0 else 0 for k in ('input_tokens','output_tokens')}
-            self.current_id=next(iter(results),None);self.refresh();self.dirty=False
-            self.status.set('Session restored. Enter your API key to resume unfinished paragraphs.')
+            self.current_id=next(iter(results),next(iter(saved_idioms),None));self.refresh();self.dirty=False
+            self.status.set(f"Restored {self.session_identity['session_name']}. Enter your API key to resume.")
         except (OSError,ValueError,AnalysisError) as e:messagebox.showerror('Cannot open session',str(e))
 
     def save_csv(self):
@@ -905,7 +1076,7 @@ class Atlas(tk.Tk):
         if path:
             try:
                 with open(path,'w',encoding='utf-8-sig',newline='') as f:
-                    w=csv.writer(f);w.writerow(['paragraph','intensity','valence','direction','direction_status','tone','uncertainty','emotions','summary','text','model'])
+                    w=csv.writer(f);w.writerow(['sentence' if self.mode_used=='sentence' else 'paragraph','intensity','valence','direction','direction_status','tone','uncertainty','emotions','summary','text','model'])
                     for i,r in sorted(self.results.items()):
                         row=[i,r['intensity'],r['valence'],r['direction'],r['direction_status'],r['tone'],r['uncertainty'],', '.join(e['label'] for e in r['emotions']),r['summary'],self.paragraphs[i-1],self.session_model]
                         # Protect imported spreadsheet cells from formula interpretation.
@@ -915,14 +1086,14 @@ class Atlas(tk.Tk):
 
     def method(self):
         messagebox.showinfo('About the analysis',
-            'The selected model infers emotional meaning from each paragraph and nearby context.\n\n'
+            'The selected model infers emotional meaning from each text segment and nearby context.\n\n'
             'Intensity: 0 absent → 1 extreme strength of feeling.\n'
             'Valence: −1 unpleasant → +1 pleasant. Opposing feelings can balance valence without lowering intensity.\n'
             'Direction: −1 internal/self-focused → +1 directed toward others or the world. Unclear direction is not plotted.\n\n'
             'Each result decomposes emotions into experiencer, target/focus, scores, and verbatim evidence. '
             'These are interpretive estimates, not validated psychological measurements or a diagnosis. '
             'Uncertainty is a model judgment, not a calibrated probability.\n\n'
-            'Paragraphs are sent in batches of up to 6, with up to 1,200 characters of neighboring context per side. '
+            'Text segments are sent in batches of up to 6, with up to 1,200 characters of neighboring context per side. '
             'There is no whole-book memory. Keys stay in memory and are excluded from exports. '
             'OpenAI requests use store=false. VT ARC requests go to ARC, which logs interactions under VT policies.\n\n'
             'Open any UTF-8 .txt file or paste your own text to begin.',parent=self)
