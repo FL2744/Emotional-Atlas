@@ -1,3 +1,9 @@
+# 1.0
+
+- Publish the current feature set as Emotional Atlas 1.0, with updated installation links and feature overview.
+- Retain existing analysis-session and transfer-checkpoint formats.
+- Rebuild, Developer ID sign, and Apple-notarize the versioned macOS app.
+
 # 0.9.10
 
 - Add a Dark/Light appearance selector beside Method. Switch existing and newly opened main, expanded, object and transfer windows between dark and white-background palettes while preserving data colors and chosen surface colors. Dark remains the startup default.

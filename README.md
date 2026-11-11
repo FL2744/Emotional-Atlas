@@ -1,12 +1,14 @@
 <p align="center"><img src="assets/emotional-atlas-logo.png" width="100%" alt="Emotional Atlas — white constellation mark and clean white wordmark on charcoal"></p>
 
-# Emotional Atlas
+# Emotional Atlas 1.0
 
-**Explore emotional shifts in dreams and literature, paragraph by paragraph.**
+**Explore, visualize, and transform emotional movement in dreams and literature.**
 
-Emotional Atlas is a native desktop application that uses **OpenAI GPT-6 Luna or a VT ARC model** to infer emotional meaning, identify supporting words and passages, and map paragraphs in an interactive 3D space. It includes text-order animation, PCA views, and resumable analysis sessions in a dark monochrome interface inspired by FENNEC and LAMP, with red-to-blue valence colors reserved for plot points.
+Emotional Atlas is a native desktop application that uses **OpenAI GPT-6 Luna or a VT ARC model** to infer emotional meaning, identify supporting words and passages, and map paragraphs or sentences in an interactive 3D space. Version 1.0 includes text-order animation, PCA, solid and evolving 3D/4D objects, multilingual idiom candidates, and emotional shape transfer with resumable checkpoints. The monochrome interface offers Dark and Light modes, with color retained for plot data and selected object surfaces.
 
-[Download macOS v0.9.10](https://github.com/FL2744/Emotional-Atlas/releases/tag/v0.9.10) · [Technical report](docs/TECHNICAL_REPORT.md) · [User guide](docs/USER_GUIDE.md) · [Release notes](CHANGELOG.md)
+[Download macOS v1.0](https://github.com/FL2744/Emotional-Atlas/releases/tag/v1.0) · [Technical report](docs/TECHNICAL_REPORT.md) · [User guide](docs/USER_GUIDE.md) · [Release notes](CHANGELOG.md)
+
+Version 1.0 promotes the current feature set to the 1.0 release; it retains compatibility with existing analysis sessions and transfer checkpoints. The technical report documents the same implementation feature set under version 0.9.10.
 
 ## Features
 
@@ -23,9 +25,9 @@ Emotional Atlas is a native desktop application that uses **OpenAI GPT-6 Luna or
 
 ## Install on macOS
 
-The v0.9.10 binary targets **Apple Silicon (arm64), macOS 15 or later**. The bundled binaries are checked for a macOS 15.0 or earlier deployment target; the packaged app is smoke-tested on macOS 26.6.2. Intel and other operating systems do not have packaged releases yet.
+The v1.0 binary targets **Apple Silicon (arm64), macOS 15 or later**. The bundled binaries are checked for a macOS 15.0 or earlier deployment target; the packaged app is smoke-tested on macOS 26.6.2. Intel and other operating systems do not have packaged releases yet.
 
-1. Download `Emotional-Atlas-v0.9.10-macOS-arm64.zip` from the [v0.9.10 release](https://github.com/FL2744/Emotional-Atlas/releases/tag/v0.9.10).
+1. Download `Emotional-Atlas-v1.0-macOS-arm64.zip` from the [v1.0 release](https://github.com/FL2744/Emotional-Atlas/releases/tag/v1.0).
 2. Extract the ZIP and drag **Emotional Atlas.app** into Applications.
 3. Open the app.
 
