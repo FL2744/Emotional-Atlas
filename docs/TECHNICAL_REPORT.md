@@ -190,6 +190,10 @@ A rigorous future evaluation should measure: inter-reader agreement on emotional
 
 Emotional Atlas should therefore be understood as an inspectable experimental instrument for reading and transformation. Its strongest technical commitments are traceable source evidence, explicit geometric definitions, visible selection policies, and exportable records—not objective measurement of a person's emotions.
 
+## AI-use disclosure
+
+This project was created with assistance from GPT-6 Astra and Codex. AI tools supported software development, testing, and drafting and revision of this technical report. William Taggart is responsible for the research decisions and final software and documentation. AI assistance does not constitute independent validation of the implementation or its scientific claims; the verification evidence and limitations are stated separately in this report.
+
 ## 11. Implementation references
 
 The report corresponds to version 0.9.10 in this repository. Primary implementation and operational documentation:
@@ -199,10 +203,6 @@ The report corresponds to version 0.9.10 in this repository. Primary implementat
 - [Idiom implementation](../idioms.py), [idiom data and limitations](idioms.md), and [third-party notices](../THIRD_PARTY_NOTICES.md).
 - [Shape-transfer engine](../shape_transfer.py), [transfer guide](shape-transfer.md), and [checkpoint implementation](../transfer_session.py).
 - [Native smoke checks](../smoke.py), [release workflow](../scripts/release_notarized.sh), and [release history](../CHANGELOG.md).
-
-## AI-use disclosure
-
-This project was created with assistance from GPT-6 Astra and Codex. AI tools supported software development, testing, and drafting and revision of this technical report. William Taggart is responsible for the research decisions and final software and documentation. AI assistance does not constitute independent validation of the implementation or its scientific claims; the verification evidence and limitations are stated separately in this report.
 
 ## Suggested citation
 
