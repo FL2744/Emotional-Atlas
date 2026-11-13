@@ -1,5 +1,7 @@
 <p align="center"><img src="assets/emotional-atlas-logo.png" width="100%" alt="Emotional Atlas — white constellation mark and clean white wordmark on charcoal"></p>
 
+**ACM technical report:** [PDF](docs/acm/Emotional-Atlas.pdf) · [Markdown](docs/TECHNICAL_REPORT.md) · [LaTeX](docs/acm/main.tex) · [Complete LaTeX package](docs/acm/Emotional-Atlas-ACM-source.zip)
+
 # Emotional Atlas 1.0
 
 **Explore, visualize, and transform emotional movement in dreams and literature.**
