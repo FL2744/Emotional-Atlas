@@ -171,3 +171,11 @@ strength, flexible transformation (default) or strict meaning preservation, boun
 exports. Source geometry is used directly from memory; no export is required.
 Flexible transformation is the default and permits meaning changes; Preserve meaning offers stricter editing. Neither guarantees an exact shape match.
 See [transfer documentation](docs/shape-transfer.md) for workflow, limits and math.
+
+<!-- illustrated-paper -->
+## Illustrated technical paper
+
+[PDF](docs/acm/Emotional-Atlas.pdf) · [ACM LaTeX](docs/acm/main.tex) · [Markdown](docs/acm/TECHNICAL_PAPER.md) · [Figures and source](docs/acm/)
+
+This edition includes at least five tightly cropped explanatory illustrations, with vector and raster assets and reproducible figure sources. The GH and HF paper files match.
+<!-- /illustrated-paper -->

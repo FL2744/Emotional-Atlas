@@ -7,6 +7,7 @@
 \usetikzlibrary{positioning}
 \DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,fontsize=\small}
 \providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{graphicx}
 \begin{document}
 \title{Emotional Atlas: Emotional Geometry, Textual Evolution, and Shape-Guided Revision}
 \author{William Taggart}
@@ -138,6 +139,15 @@ application does not silently substitute another model. Transfer uses
 the source analysis's provider/model to reduce one source of scoring
 inconsistency.
 
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/illustration-01.pdf}
+\caption{Analysis pipeline. Model judgments are locally validated against source evidence before eligible segments enter geometry; validation is not evidence of psychometric accuracy.}
+\Description{From text to evidence-backed coordinates. Analysis pipeline. Model judgments are locally validated against source evidence before eligible segments enter geometry; validation is not evidence of psychometric accuracy.}
+\label{fig:illustration-1}
+\end{figure}
+
 \section{Emotional inference and
 evidence}\label{emotional-inference-and-evidence}
 
@@ -196,6 +206,15 @@ poetry, and punctuation-free text can be segmented imperfectly. Changing
 analysis granularity starts a separate analysis; saved metadata
 identifies the segmentation mode even where legacy fields retain names
 such as \nolinkurl{paragraphs}.
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/illustration-02.pdf}
+\caption{Emotional coordinate mapping. Intensity is centered for display, while an unknown direction prevents construction of a complete point. PCA, when used, acts on these scores rather than token embeddings.}
+\Description{Three scores define a display point. Emotional coordinate mapping. Intensity is centered for display, while an unknown direction prevents construction of a complete point. PCA, when used, acts on these scores rather than token embeddings.}
+\label{fig:illustration-2}
+\end{figure}
 
 \section{Emotional geometry and PCA}\label{emotional-geometry-and-pca}
 
@@ -283,6 +302,15 @@ plus the final slice at the endpoint. This is text-order evolution, not
 elapsed reading time or a projected 4D convex hull. Topology can change
 between slices, and unmatched vertices are not interpolated.
 
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/illustration-03.pdf}
+\caption{Object-view schematic. The three surface constructions and optional smoothing do not change the underlying emotional scores. Evolution denotes text-order slices, not a four-dimensional convex hull.}
+\Description{Objects are constructions from the same points. Object-view schematic. The three surface constructions and optional smoothing do not change the underlying emotional scores. Evolution denotes text-order slices, not a four-dimensional convex hull.}
+\label{fig:illustration-3}
+\end{figure}
+
 \section{Multilingual idioms and dream
 imagery}\label{multilingual-idioms-and-dream-imagery}
 
@@ -310,6 +338,15 @@ annotations are interpretive hypotheses, not explanations of a dreamer's
 mental state. ChengyuBench is identified in project documentation as a
 potential evaluation resource; it is not bundled or used to establish
 the system's accuracy.
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/illustration-04.pdf}
+\caption{Idiom workflow. A literal image alone is not proof of an idiom; retrieved expressions and quoted evidence support hypotheses with alternative readings.}
+\Description{Grounding idiom and dream-imagery candidates. Idiom workflow. A literal image alone is not proof of an idiom; retrieved expressions and quoted evidence support hypotheses with alternative readings.}
+\label{fig:illustration-4}
+\end{figure}
 
 \section{Emotional shape transfer}\label{emotional-shape-transfer}
 
@@ -392,6 +429,15 @@ Final-scoring failures preserve the revision but leave its earlier score
 provisional. Report records distinguish these failures from completed
 verification. Provider/transport failures and explicit cancellation
 still stop processing.
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/illustration-05.pdf}
+\caption{Transfer schematic. Source geometry is sampled from the in-memory analysis. Candidate selection depends on the configured policy and assessed coordinates, with resumable audit records.}
+\Description{Shape transfer uses the raw trajectory. Transfer schematic. Source geometry is sampled from the in-memory analysis. Candidate selection depends on the configured policy and assessed coordinates, with resumable audit records.}
+\label{fig:illustration-5}
+\end{figure}
 
 \section{Persistence and exports}\label{persistence-and-exports}
 

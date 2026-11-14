@@ -1,21 +1,9 @@
-# Emotional Atlas: ACM manuscript sources
+# Emotional Atlas illustrated technical report
 
-Uses the official ACM `acmart` class with `manuscript,screen,nonacm` options. This is an independently distributed technical report, not a claim of ACM publication or acceptance.
+[PDF](Emotional-Atlas.pdf) · [ACM LaTeX](main.tex) · [Markdown](TECHNICAL_PAPER.md) · [Illustrations](figures/)
 
-The content describes software version 0.9.10 (original report dated November 11, 2026). The ACM edition is dated November 13, 2026. Historical results and version-specific limitations are retained.
+Five tightly cropped, reproducible technical diagrams explain the mechanisms described in the report. These are explanatory schematics, not application screenshots or new experimental results. The existing literature and scientific qualifications are retained. AI disclosure precedes references.
 
-## Build
+Build with `tectonic main.tex` (rename the resulting PDF to `Emotional-Atlas.pdf` where needed). The source archive includes all figure PDFs and PNGs.
 
-```sh
-latexmk -pdf main.tex
-```
-
-Or, with Tectonic:
-
-```sh
-tectonic --keep-logs main.tex
-```
-
-Tested with Tectonic 0.17.0 and bundled acmart v1.83. The output is `main.pdf`, distributed as `Emotional-Atlas.pdf`. Equations, tables, and the TikZ workflow diagram are native LaTeX. Implementation references remain linked in the report; the original does not contain a separate scholarly bibliography.
-
-The Markdown edition is included. Its `acm/` download paths correspond to its repository location at `docs/TECHNICAL_REPORT.md`; source implementation links are relative to that location.
+Regenerate the diagrams with `python3 render_figures.py` (requires Matplotlib). Diagram titles and captions are recorded in `ILLUSTRATIONS.json`; vector PDF and raster PNG versions are provided.

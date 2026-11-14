@@ -1,0 +1,92 @@
+[
+  [
+    "Emotional inference and evidence",
+    "From text to evidence-backed coordinates",
+    [
+      [
+        "Paragraph / sentence units",
+        "LLM inference",
+        "Validate IDs, ranges, quotes"
+      ],
+      [
+        "Validated segment records",
+        "Known 3D coordinates",
+        "Plots, objects and exports"
+      ]
+    ],
+    "Unsupported direction stays unknown; missing coordinates are not fabricated",
+    "Analysis pipeline. Model judgments are locally validated against source evidence before eligible segments enter geometry; validation is not evidence of psychometric accuracy."
+  ],
+  [
+    "Emotional geometry and PCA",
+    "Three scores define a display point",
+    [
+      [
+        "Valence V: unpleasant to pleasant",
+        "Direction D: inward to outward",
+        "Intensity I: low to high"
+      ],
+      [
+        "x = V",
+        "y = D",
+        "z = 2I - 1"
+      ]
+    ],
+    "All display coordinates lie in [-1, 1]; equal scaling is a modeling convention",
+    "Emotional coordinate mapping. Intensity is centered for display, while an unknown direction prevents construction of a complete point. PCA, when used, acts on these scores rather than token embeddings."
+  ],
+  [
+    "Multilingual idioms and dream imagery",
+    "Objects are constructions from the same points",
+    [
+      [
+        "Convex hull",
+        "Filtered Delaunay exterior",
+        "Text-order tube"
+      ],
+      [
+        "Optional Loop subdivision",
+        "Fixed-basis temporal slices",
+        "Mesh and evolution export"
+      ]
+    ],
+    "Smoothing can shrink surfaces; different constructions need not share topology",
+    "Object-view schematic. The three surface constructions and optional smoothing do not change the underlying emotional scores. Evolution denotes text-order slices, not a four-dimensional convex hull."
+  ],
+  [
+    "Emotional shape transfer",
+    "Grounding idiom and dream-imagery candidates",
+    [
+      [
+        "Passage or dream imagery",
+        "Propose canonical expression",
+        "Retrieve dictionary entry"
+      ],
+      [
+        "Verify against passage",
+        "Check entry ID and quote",
+        "Present tentative annotation"
+      ]
+    ],
+    "Direct use, transformed expression and imagery echo remain distinct cases",
+    "Idiom workflow. A literal image alone is not proof of an idiom; retrieved expressions and quoted evidence support hypotheses with alternative readings."
+  ],
+  [
+    "Persistence and exports",
+    "Shape transfer uses the raw trajectory",
+    [
+      [
+        "Source emotional coordinates",
+        "Interpolate p(t)",
+        "Sample target unit positions"
+      ],
+      [
+        "Target baseline b_j",
+        "Blend q_j = (1-s)b_j + s p(t_j)",
+        "Rewrite, score and select"
+      ]
+    ],
+    "No mesh export is required; PCA coordinates and surface colors are not transfer targets",
+    "Transfer schematic. Source geometry is sampled from the in-memory analysis. Candidate selection depends on the configured policy and assessed coordinates, with resumable audit records."
+  ]
+]
