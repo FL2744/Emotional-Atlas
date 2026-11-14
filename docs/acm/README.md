@@ -1,6 +1,6 @@
 # Emotional Atlas illustrated technical report
 
-[PDF](Emotional-Atlas.pdf) · [ACM LaTeX](main.tex) · [Markdown](TECHNICAL_PAPER.md) · [Illustrations](figures/)
+**Technical paper:** [PDF](Emotional-Atlas.pdf) · [LaTeX](main.tex) · [Markdown](TECHNICAL_PAPER.md) · [Illustrations](figures/)
 
 Five tightly cropped, reproducible technical diagrams explain the mechanisms described in the report. These are explanatory schematics, not application screenshots or new experimental results. The existing literature and scientific qualifications are retained. AI disclosure precedes references.
 

@@ -1,6 +1,6 @@
 # Emotional Atlas: Emotional Geometry, Textual Evolution, and Shape-Guided Revision
 
-**ACM manuscript:** [PDF](Emotional-Atlas.pdf) · [LaTeX source](main.tex) · [Complete LaTeX package](Emotional-Atlas-ACM-source.zip)
+**Technical paper:** [PDF](Emotional-Atlas.pdf) · [LaTeX source](main.tex) · [Complete LaTeX package](Emotional-Atlas-ACM-source.zip)
 
 **William Taggart**  
 Modern and Classical Languages and Literatures  

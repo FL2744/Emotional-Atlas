@@ -1,6 +1,6 @@
 <p align="center"><img src="assets/emotional-atlas-logo.png" width="100%" alt="Emotional Atlas — white constellation mark and clean white wordmark on charcoal"></p>
 
-**ACM technical report:** [PDF](docs/acm/Emotional-Atlas.pdf) · [Markdown](docs/TECHNICAL_REPORT.md) · [LaTeX](docs/acm/main.tex) · [Complete LaTeX package](docs/acm/Emotional-Atlas-ACM-source.zip)
+**Technical paper:** [PDF](docs/acm/Emotional-Atlas.pdf) · [Markdown](docs/TECHNICAL_REPORT.md) · [LaTeX](docs/acm/main.tex) · [Complete LaTeX package](docs/acm/Emotional-Atlas-ACM-source.zip) · [Markdown](docs/acm/TECHNICAL_PAPER.md) · [Figures and source](docs/acm/)
 
 # Emotional Atlas 1.0
 
@@ -171,11 +171,3 @@ strength, flexible transformation (default) or strict meaning preservation, boun
 exports. Source geometry is used directly from memory; no export is required.
 Flexible transformation is the default and permits meaning changes; Preserve meaning offers stricter editing. Neither guarantees an exact shape match.
 See [transfer documentation](docs/shape-transfer.md) for workflow, limits and math.
-
-<!-- illustrated-paper -->
-## Illustrated technical paper
-
-[PDF](docs/acm/Emotional-Atlas.pdf) · [ACM LaTeX](docs/acm/main.tex) · [Markdown](docs/acm/TECHNICAL_PAPER.md) · [Figures and source](docs/acm/)
-
-This edition includes at least five tightly cropped explanatory illustrations, with vector and raster assets and reproducible figure sources. The GH and HF paper files match.
-<!-- /illustrated-paper -->
