@@ -57,9 +57,7 @@ flowchart TD
 
 The configured OpenAI adapter uses the Responses API and model identifier `gpt-6-luna`. VT ARC uses a Chat Completions-compatible endpoint, defaults to `gpt-oss-120b`, and permits a user-specified model identifier. These are software configuration values, not guarantees of provider availability. The application does not silently substitute another model. Transfer uses the source analysis's provider/model to reduce one source of scoring inconsistency.
 
-![From text to evidence-backed coordinates](acm/figures/illustration-01.png)
-
-*Illustration 1. Analysis pipeline. Model judgments are locally validated against source evidence before eligible segments enter geometry; validation is not evidence of psychometric accuracy.*
+Model judgments are checked locally against the source text before eligible segments enter the geometry. These checks establish consistency with the expected response structure and quoted evidence; they do not establish psychometric accuracy.
 
 ## 3. Emotional inference and evidence
 
@@ -134,7 +132,7 @@ An image such as someone taking a goat could be proposed as an echo of “get yo
 
 ![Grounding idiom and dream-imagery candidates](acm/figures/illustration-04.png)
 
-*Illustration 4. Idiom workflow. A literal image alone is not proof of an idiom; retrieved expressions and quoted evidence support hypotheses with alternative readings.*
+*Figure 4. Idiom workflow. A literal image alone is not proof of an idiom; retrieved expressions and quoted evidence support hypotheses with alternative readings.*
 
 ## 7. Emotional shape transfer
 
