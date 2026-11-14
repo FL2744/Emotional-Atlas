@@ -223,11 +223,11 @@ This project was created with assistance from GPT-6 Astra and Codex. AI tools su
 
 The report corresponds to version 0.9.10 in this repository. Primary implementation and operational documentation:
 
-- [Inference and validation](../analysis.py), [PCA](../pca.py), and [segmentation](../segmentation.py).
-- [Geometry implementation](../geometry.py) and [solid/evolving-object guide](objects.md).
-- [Idiom implementation](../idioms.py), [idiom data and limitations](idioms.md), and [third-party notices](../THIRD_PARTY_NOTICES.md).
-- [Shape-transfer engine](../shape_transfer.py), [transfer guide](shape-transfer.md), and [checkpoint implementation](../transfer_session.py).
-- [Native smoke checks](../smoke.py), [release workflow](../scripts/release_notarized.sh), and [release history](../CHANGELOG.md).
+- [Inference and validation](https://github.com/FL2744/Emotional-Atlas/blob/main/analysis.py), [PCA](https://github.com/FL2744/Emotional-Atlas/blob/main/pca.py), and [segmentation](https://github.com/FL2744/Emotional-Atlas/blob/main/segmentation.py).
+- [Geometry implementation](https://github.com/FL2744/Emotional-Atlas/blob/main/geometry.py) and [solid/evolving-object guide](https://github.com/FL2744/Emotional-Atlas/blob/main/docs/objects.md).
+- [Idiom implementation](https://github.com/FL2744/Emotional-Atlas/blob/main/idioms.py), [idiom data and limitations](https://github.com/FL2744/Emotional-Atlas/blob/main/docs/idioms.md), and [third-party notices](https://github.com/FL2744/Emotional-Atlas/blob/main/THIRD_PARTY_NOTICES.md).
+- [Shape-transfer engine](https://github.com/FL2744/Emotional-Atlas/blob/main/shape_transfer.py), [transfer guide](https://github.com/FL2744/Emotional-Atlas/blob/main/docs/shape-transfer.md), and [checkpoint implementation](https://github.com/FL2744/Emotional-Atlas/blob/main/transfer_session.py).
+- [Native smoke checks](https://github.com/FL2744/Emotional-Atlas/blob/main/smoke.py), [release workflow](https://github.com/FL2744/Emotional-Atlas/blob/main/scripts/release_notarized.sh), and [release history](https://github.com/FL2744/Emotional-Atlas/blob/main/CHANGELOG.md).
 
 ## Suggested citation
 
