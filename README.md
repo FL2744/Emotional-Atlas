@@ -35,7 +35,6 @@ The v1.0 binary targets **Apple Silicon (arm64), macOS 15 or later**. The bundle
 
 Python and Tk are bundled; no separate Python installation is needed for this download. The release is **Developer ID signed and Apple-notarized**, with the notarization ticket stapled to the app. A SHA-256 checksum accompanies the download. macOS may show its normal first-launch confirmation for an app downloaded from the Internet.
 
-
 ## First analysis
 
 1. Choose **Open .txt**, or paste a passage.

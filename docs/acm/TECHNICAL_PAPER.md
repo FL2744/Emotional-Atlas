@@ -57,7 +57,6 @@ flowchart TD
 
 The configured OpenAI adapter uses the Responses API and model identifier `gpt-6-luna`. VT ARC uses a Chat Completions-compatible endpoint, defaults to `gpt-oss-120b`, and permits a user-specified model identifier. These are software configuration values, not guarantees of provider availability. The application does not silently substitute another model. Transfer uses the source analysis's provider/model to reduce one source of scoring inconsistency.
 
-
 ![From text to evidence-backed coordinates](figures/illustration-01.png)
 
 *Illustration 1. Analysis pipeline. Model judgments are locally validated against source evidence before eligible segments enter geometry; validation is not evidence of psychometric accuracy.*
@@ -83,7 +82,6 @@ Valid results are retained when a neighboring segment fails. Failed evidence may
 ### 3.3 Segmentation
 
 Sentence analysis is opt-in. The local heuristic recognizes common English, Arabic, and Chinese terminal punctuation, selected abbreviations, decimal patterns, and closing punctuation. It is not a trained multilingual sentence parser. Dialogue, unusual abbreviations, poetry, and punctuation-free text can be segmented imperfectly. Changing analysis granularity starts a separate analysis; saved metadata identifies the segmentation mode even where legacy fields retain names such as `paragraphs`.
-
 
 ![Three scores define a display point](figures/illustration-02.png)
 
@@ -125,7 +123,6 @@ $$W=\bigcup_{i=1}^{N-1}S_i\times[\tau_i,\tau_{i+1}),$$
 
 plus the final slice at the endpoint. This is text-order evolution, not elapsed reading time or a projected 4D convex hull. Topology can change between slices, and unmatched vertices are not interpolated.
 
-
 ![Objects are constructions from the same points](figures/illustration-03.png)
 
 *Illustration 3. Object-view schematic. The three surface constructions and optional smoothing do not change the underlying emotional scores. Evolution denotes text-order slices, not a four-dimensional convex hull.*
@@ -137,7 +134,6 @@ Idiom scanning is a separate workflow. It distinguishes possible direct use, tra
 The bundled inventory contains 20 English and 10 Arabic starter expressions with project-authored glosses, plus 30,895 Chinese records adapted from `pwxcoo/chinese-xinhua`, revision `fe6d6c2e8baa82187f4c96bbe042e43f96c05666`. Its MIT license and attribution are retained in the repository. Inventory size does not measure detection accuracy. English/Arabic coverage is preliminary; dialect variation and Chinese traditional/simplified normalization remain limitations. Imported dictionaries extend coverage and must supply IDs, language, phrase, meaning, source and license metadata.
 
 An image such as someone taking a goat could be proposed as an echo of “get your goat,” but lexical overlap or an object alone is insufficient proof. Alternative readings are presented. These annotations are interpretive hypotheses, not explanations of a dreamer's mental state. ChengyuBench is identified in project documentation as a potential evaluation resource; it is not bundled or used to establish the system's accuracy.
-
 
 ![Grounding idiom and dream-imagery candidates](figures/illustration-04.png)
 
@@ -174,7 +170,6 @@ There is no fixed document-length or unit-count cap in transfer preparation. Ove
 A normal one-attempt batch uses approximately five model calls before correction, retries or failure isolation; two attempts add another rewrite/review/scoring cycle. Long documents can require substantial time and API usage. Completed-response usage counters can undercount requests whose responses were interrupted or rejected before accounting was returned.
 
 Passage-specific failures trigger bounded batch isolation. Persistently failing passages are flagged, retaining the original or an accepted earlier revision, and later passages continue automatically. Final-scoring failures preserve the revision but leave its earlier score provisional. Report records distinguish these failures from completed verification. Provider/transport failures and explicit cancellation still stop processing.
-
 
 ![Shape transfer uses the raw trajectory](figures/illustration-05.png)
 
@@ -231,4 +226,4 @@ The report corresponds to version 0.9.10 in this repository. Primary implementat
 
 ## Suggested citation
 
-William Taggart. 2026. Emotional Atlas: Emotional Geometry, Textual Evolution, and Shape-Guided Revision. Technical report on software version 0.9.10. Modern and Classical Languages and Literatures, Virginia Tech. ACM manuscript edition, November 13, 2026. https://github.com/FL2744/Emotional-Atlas
+William Taggart. 2026. Emotional Atlas: Emotional Geometry, Textual Evolution, and Shape-Guided Revision. Technical report on software version 0.9.10. Modern and Classical Languages and Literatures, Virginia Tech. November 13, 2026. https://github.com/FL2744/Emotional-Atlas

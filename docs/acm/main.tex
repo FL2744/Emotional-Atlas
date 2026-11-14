@@ -14,7 +14,7 @@
 \affiliation{\department{Modern and Classical Languages and Literatures}
 \institution{Virginia Tech}\city{Blacksburg}\state{Virginia}\country{USA}}
 \email{wtaggart@vt.edu}
-\subtitle{Technical report on version 0.9.10; ACM manuscript edition, November 13, 2026}
+\subtitle{Technical report on version 0.9.10; November 13, 2026}
 \begin{abstract}
 Emotional Atlas is a desktop environment for examining emotional
 movement in literary texts and dream reports. It combines large language
@@ -65,7 +65,6 @@ export operations also use background work where implemented. Local
 plotting, playback, PCA, and saved-result inspection do not require new
 model requests.
 
-
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[node distance=7mm and 7mm,
@@ -92,7 +91,6 @@ model requests.
 \caption{Emotional Atlas analysis, visualization, idiom, and shape-transfer workflows.}
 \Description{Text passes through inference and validation to resumable results. Results feed plots, solid evolution and a source trajectory. Idiom verification feeds results. The source trajectory and target text feed rewriting, review and export.}
 \end{figure}
-
 
 { % do not increment counter
 \begin{longtable}[]{@{}
@@ -138,7 +136,6 @@ configuration values, not guarantees of provider availability. The
 application does not silently substitute another model. Transfer uses
 the source analysis's provider/model to reduce one source of scoring
 inconsistency.
-
 
 \begin{figure}[htbp]
 \centering
@@ -206,7 +203,6 @@ poetry, and punctuation-free text can be segmented imperfectly. Changing
 analysis granularity starts a separate analysis; saved metadata
 identifies the segmentation mode even where legacy fields retain names
 such as \nolinkurl{paragraphs}.
-
 
 \begin{figure}[htbp]
 \centering
@@ -302,7 +298,6 @@ plus the final slice at the endpoint. This is text-order evolution, not
 elapsed reading time or a projected 4D convex hull. Topology can change
 between slices, and unmatched vertices are not interpolated.
 
-
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/illustration-03.pdf}
@@ -338,7 +333,6 @@ annotations are interpretive hypotheses, not explanations of a dreamer's
 mental state. ChengyuBench is identified in project documentation as a
 potential evaluation resource; it is not bundled or used to establish
 the system's accuracy.
-
 
 \begin{figure}[htbp]
 \centering
@@ -429,7 +423,6 @@ Final-scoring failures preserve the revision but leave its earlier score
 provisional. Report records distinguish these failures from completed
 verification. Provider/transport failures and explicit cancellation
 still stop processing.
-
 
 \begin{figure}[htbp]
 \centering
@@ -615,7 +608,7 @@ implementation and operational documentation:
 William Taggart. 2026. Emotional Atlas: Emotional Geometry, Textual
 Evolution, and Shape-Guided Revision. Technical report on software
 version 0.9.10. Modern and Classical Languages and Literatures, Virginia
-Tech. ACM manuscript edition, November 13, 2026.
+Tech. November 13, 2026.
 https://github.com/FL2744/Emotional-Atlas
 
 \end{document}
