@@ -21,17 +21,6 @@
         1700
       ],
       "caption": "Solid-object window showing the outermost-point surface, labeled emotional axes, mathematical description, and export controls for the saved analysis."
-    },
-    {
-      "file": "figures/screenshot-03.png",
-      "source": "emotional-atlas-03.jpg",
-      "crop": [
-        28,
-        30,
-        1010,
-        1110
-      ],
-      "caption": "PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits."
     }
   ],
   "retained_diagrams": [

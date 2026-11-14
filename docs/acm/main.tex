@@ -21,7 +21,7 @@
 \setlength{\intextsep}{12pt plus 2pt minus 3pt}
 \raggedbottom
 
-\geometry{top=0.75in,bottom=0.65in,includeheadfoot}
+\geometry{left=1in,right=1in,top=0.75in,bottom=0.65in,includeheadfoot}
 \begin{document}
 \title{Emotional Atlas: Emotional Geometry, Textual Evolution, and Shape-Guided Revision}
 \author{William Taggart}
@@ -154,7 +154,7 @@ inconsistency.
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=\textwidth]{figures/illustration-01.pdf}
+\includegraphics[width=.9\textwidth]{figures/illustration-01.pdf}
 \caption{Analysis pipeline. Model judgments are locally validated against source evidence before eligible segments enter geometry; validation is not evidence of psychometric accuracy.}
 \Description{From text to evidence-backed coordinates. Analysis pipeline. Model judgments are locally validated against source evidence before eligible segments enter geometry; validation is not evidence of psychometric accuracy.}
 \label{fig:illustration-1}
@@ -223,29 +223,18 @@ such as \nolinkurl{paragraphs}.
 \section{Emotional geometry and PCA}\label{emotional-geometry-and-pca}
 
 
+
+The primary plot places each eligible text segment at a point with three coordinates. The horizontal x coordinate is valence, ranging from unpleasant (-1) to pleasant (+1). The y coordinate is emotional direction, ranging from inward or self-focused (-1) to directed toward another person, object, or the world (+1). The z coordinate represents emotional intensity: the original intensity score is doubled and then reduced by one, so an intensity of 0 appears at -1, an intensity of 0.5 at 0, and an intensity of 1 at +1.
+
+This conversion puts all three display axes on the same numeric range without changing the ordering of intensity scores. Equal axis ranges are a modeling convention, not an empirically established equality of emotional distances. Point color normally represents valence; an idiom annotation can instead mark a point in yellow.
+
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=\linewidth,height=0.58\textheight,keepaspectratio]{figures/screenshot-01.png}
+\includegraphics[width=.88\linewidth,height=0.58\textheight,keepaspectratio]{figures/screenshot-01.png}
 \caption{Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence.}
 \Description{Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence.}
 \label{fig:app-screen-1}
 \end{figure}
-
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=\linewidth,height=0.58\textheight,keepaspectratio]{figures/screenshot-03.png}
-\caption{PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits.}
-\Description{PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits.}
-\label{fig:app-screen-3}
-\end{figure}
-The primary plot embeds a segment as:
-
-\[p_i=(V_i,D_i,2I_i-1)\in[-1,1]^3.\]
-
-This puts all three display axes on the same numeric range. The equal
-scaling is a modeling convention, not an empirically established
-equality of emotional distances. Color represents valence unless an
-idiom annotation activates a yellow marker.
 
 Unknown direction is not replaced with zero. Such segments remain
 available in the results but lack a full 3D coordinate and are excluded
@@ -274,7 +263,7 @@ evolution}\label{solid-objects-curved-surfaces-and-evolution}
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=\linewidth,height=0.58\textheight,keepaspectratio]{figures/screenshot-02.png}
+\includegraphics[width=.88\linewidth,height=0.58\textheight,keepaspectratio]{figures/screenshot-02.png}
 \caption{Solid-object window showing the outermost-point surface, labeled emotional axes, mathematical description, and export controls for the saved analysis.}
 \Description{Solid-object window showing the outermost-point surface, labeled emotional axes, mathematical description, and export controls for the saved analysis.}
 \label{fig:app-screen-2}
@@ -361,7 +350,7 @@ the system's accuracy.
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=\textwidth]{figures/illustration-04.pdf}
+\includegraphics[width=.9\textwidth]{figures/illustration-04.pdf}
 \caption{Idiom workflow. A literal image alone is not proof of an idiom; retrieved expressions and quoted evidence support hypotheses with alternative readings.}
 \Description{Grounding idiom and dream-imagery candidates. Idiom workflow. A literal image alone is not proof of an idiom; retrieved expressions and quoted evidence support hypotheses with alternative readings.}
 \label{fig:illustration-4}
@@ -627,6 +616,6 @@ William Taggart. 2026. Emotional Atlas: Emotional Geometry, Textual
 Evolution, and Shape-Guided Revision. Technical report on software
 version 0.9.10. Modern and Classical Languages and Literatures, Virginia
 Tech. November 13, 2026.
-https://github.com/FL2744/Emotional-Atlas
+\url{https://github.com/FL2744/Emotional-Atlas}
 
 \end{document}

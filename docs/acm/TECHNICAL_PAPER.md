@@ -85,18 +85,13 @@ Sentence analysis is opt-in. The local heuristic recognizes common English, Arab
 
 ## 4. Emotional geometry and PCA
 
-The primary plot embeds a segment as:
+The primary plot places each eligible text segment at a point with three coordinates. The horizontal x coordinate is valence, ranging from unpleasant (-1) to pleasant (+1). The y coordinate is emotional direction, ranging from inward or self-focused (-1) to directed toward another person, object, or the world (+1). The z coordinate represents emotional intensity: the original intensity score is doubled and then reduced by one, so an intensity of 0 appears at -1, an intensity of 0.5 at 0, and an intensity of 1 at +1.
 
-![PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits.](figures/screenshot-03.png)
-
-*PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits.*
+This conversion puts all three display axes on the same numeric range without changing the ordering of intensity scores. Equal axis ranges are a modeling convention, not an empirically established equality of emotional distances. Point color normally represents valence; an idiom annotation can instead mark a point in yellow.
 
 ![Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence.](figures/screenshot-01.png)
 
 *Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence.*
-$$p_i=(V_i,D_i,2I_i-1)\in[-1,1]^3.$$
-
-This puts all three display axes on the same numeric range. The equal scaling is a modeling convention, not an empirically established equality of emotional distances. Color represents valence unless an idiom annotation activates a yellow marker.
 
 Unknown direction is not replaced with zero. Such segments remain available in the results but lack a full 3D coordinate and are excluded from geometry. Thus an empty original-target plot does not by itself establish emotional neutrality: it can indicate unsupported direction. Identical coordinates can also overlap.
 
