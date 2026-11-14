@@ -13,23 +13,19 @@ Email: [wtaggart@vt.edu](mailto:wtaggart@vt.edu)
 
 Emotional Atlas is a desktop environment for examining emotional movement in literary texts and dream reports. It combines large language model (LLM) inference with locally validated textual evidence, a three-coordinate emotional representation, interactive visualization, geometric construction, and text-order evolution. A separate multilingual idiom workflow proposes direct expressions, transformed expressions, and tentative imagery echoes. An emotional shape-transfer workspace uses the trajectory of a source analysis to guide revision of another text. The system supports conservative editing and a more permissive transformation policy, reports its decisions, and preserves resumable checkpoints. This report describes the implemented algorithms, data flow, operational constraints, and verification of version 0.9.10. The scores and interpretations are model judgments, not established psychometric measurements; software verification does not establish interpretive accuracy or transfer efficacy.
 
-## 1. Scope and design
+## Purpose and Research Context
 
-The application supports exploratory reading and computational experimentation. Its central unit is a text segment: ordinarily a paragraph, optionally a line, or a sentence when granular analysis is enabled. The interface preserves a distinction between source text, inferred emotional descriptions, derived coordinates, and geometric representations. Changing a surface or viewing mode does not change the underlying scores.
+Emotional Atlas supports exploratory reading of literature and dream reports by representing changes in emotional interpretation across a text. Its central unit is a segment, ordinarily a paragraph and optionally a line or sentence. The application keeps the source passage, inferred emotional description, numerical coordinates, and rendered geometry distinct so that a reader can inspect how an interpretation becomes a visual pattern. The aim is to make those transformations available for comparison and experimentation rather than to assign a unique emotional meaning to a text.
 
-The main window contains text input, provider controls, the primary scatter plot, results, and evidence inspection. Expanded plots, solid/evolving objects, and shape transfer use separate windows. Dark mode is the startup default; a Light option changes interface backgrounds and text across open and newly created windows. Valence colors, yellow idiom markers, and user-selected surface colors remain distinct from interface appearance.
+Dimensional accounts of affect provide a basis for asking what such coordinates can represent. Russell's circumplex organizes affect around valence and arousal ([Russell, 1980](https://doi.org/10.1037/h0077714)), while Bradley and Lang's Self-Assessment Manikin includes pleasure, arousal, and dominance in human ratings ([Bradley et al., 1994](https://doi.org/10.1016/0005-7916(94)90063-9)). Word-level norms from Warriner and colleagues and the NRC VAD lexicon offer empirical reference points ([Warriner et al., 2013](https://doi.org/10.3758/s13428-012-0314-x); [Mohammad, 2018](https://doi.org/10.18653/v1/P18-1017)). GoEmotions supplies a complementary categorical annotation scheme ([Demszky et al., 2020](https://arxiv.org/abs/2005.00547)). These resources motivate interpretable axes and explicit annotation choices, while also marking a limit: ratings of words or annotated stimuli do not validate an LLM's interpretation of an entire paragraph or dream, and emotional categories are not interchangeable with continuous dimensions.
 
-This report describes implemented functionality. It does not claim that emotional meaning has a unique geometric form, that a dream image has a determinate symbolic meaning, or that generated revisions preserve facts in flexible mode.
+The interest in movement across segments connects the application to research on emotional trajectories in literary corpora ([Reagan et al., 2016](https://arxiv.org/abs/1606.07772)). Such work motivates examining text order without assuming universal narrative templates. Emotional Atlas displays a primary scatter plot and provides expanded views, solid objects, and evolving surfaces for inspecting the same underlying analysis. PCA offers a linear summary of variation ([Jolliffe et al., 2016](https://doi.org/10.1098/rsta.2015.0202)), making the projection basis and retained variance important when comparing trajectories. Alpha-shape research provides a mathematical comparison for constructing boundaries from point sets ([Edelsbrunner et al., 1994](https://doi.org/10.1145/174462.156635)); a rendered exterior remains a geometric interpretation of the points, not an independent measurement of emotional meaning or evidence that every surface mode implements an alpha shape.
 
-### Research context
+The same distinction between interpretation and representation carries into rewriting and idiom exploration. Style-transfer research treats attribute control, content preservation, and fluency as separate evaluation concerns ([Jin et al., 2020](https://arxiv.org/abs/2011.00416)). Emotional shape transfer uses a source trajectory to guide a target rewrite, requiring those checks alongside coordinate agreement, especially when flexible revision permits semantic change. Multilingual idiomaticity benchmarks study expressions in context ([Madabushi et al., 2022](https://doi.org/10.18653/v1/2022.semeval-1.13)), whereas inferring an idiom from dream imagery reaches beyond that setting. An image resembling an idiom's literal wording is therefore presented as a candidate for reader review, not proof of an intended meaning.
 
-Dimensional models provide a research context for emotional coordinates. Russell's circumplex organizes affect around valence and arousal [A circumplex model of affect.](https://doi.org/10.1037/h0077714), while Bradley and Lang's Self-Assessment Manikin includes pleasure, arousal, and dominance in human ratings [Measuring emotion: The self-assessment manikin and the semantic differential](https://doi.org/10.1016/0005-7916(94)90063-9). Word-level affective norms from Warriner and colleagues [Norms of valence, arousal, and dominance for 13,915 English lemmas](https://doi.org/10.3758/s13428-012-0314-x) and the NRC VAD lexicon [Obtaining Reliable Human Ratings of Valence, Arousal, and Dominance for 20,000 English Words](https://doi.org/10.18653/v1/P18-1017) provide empirical reference points. These resources concern annotated stimuli and populations; they do not validate an LLM's scores for a paragraph or a dream. GoEmotions offers a complementary categorical annotation scheme [GoEmotions: A Dataset of Fine-Grained Emotions](https://arxiv.org/abs/2005.00547), illustrating why categories and continuous dimensions should not be treated as interchangeable measurements.
+Within this scope, the main window provides text input, provider controls, the scatter plot, results, and evidence inspection; separate windows support expanded plotting, object views, and shape transfer. Dark and light interface modes preserve the distinct colors used for valence, idiom markers, and selected surfaces. Changing those views does not change the underlying scores. The report describes these implemented workflows and their computational assumptions, while reserving claims of interpretive accuracy and transfer effectiveness for evaluation against appropriate human judgments.
 
-Reagan and colleagues analyze emotional trajectories in a literary corpus [The emotional arcs of stories are dominated by six basic shapes](https://arxiv.org/abs/1606.07772). Their study motivates examining change over text order, but it does not establish universal narrative templates or validate the present segmentation and scoring procedure. PCA summarizes variation through a linear projection [Principal component analysis: a review and recent developments](https://doi.org/10.1098/rsta.2015.0202); the retained variance and shared projection basis therefore matter when comparing displayed trajectories. Alpha-shape research formalizes families of boundaries constructed from point sets [Three-dimensional alpha shapes](https://doi.org/10.1145/174462.156635). It offers a geometric comparison for the app's solid-object views, not evidence that a rendered boundary measures emotional meaning or that every surface option implements an alpha shape.
-
-Text style-transfer research separates attribute control from content preservation and fluency [Deep Learning for Text Style Transfer: A Survey](https://arxiv.org/abs/2011.00416). Emotional shape transfer similarly needs separate checks of coordinate agreement, readability, and semantic change, especially when flexible rewriting is enabled. Multilingual idiomaticity benchmarks evaluate expressions in context [SemEval-2022 Task 2: Multilingual Idiomaticity Detection and Sentence Embedding](https://doi.org/10.18653/v1/2022.semeval-1.13). Inferring an idiom from dream imagery extends beyond that benchmark setting: an image resembling a literal expression is a hypothesis for reader review, not proof of the dreamer's intention.
-
-## 2. Architecture and execution
+## Architecture and execution
 
 The application is written in Python with Tk/ttk. Network inference runs in worker threads, with queued events delivered to the GUI. Geometry and export operations also use background work where implemented. Local plotting, playback, PCA, and saved-result inspection do not require new model requests.
 
@@ -67,9 +63,9 @@ The configured OpenAI adapter uses the Responses API and model identifier `gpt-6
 
 Model judgments are checked locally against the source text before eligible segments enter the geometry. These checks establish consistency with the expected response structure and quoted evidence; they do not establish psychometric accuracy.
 
-## 3. Emotional inference and evidence
+## Emotional inference and evidence
 
-### 3.1 Representation
+### Representation
 
 For segment i, the model returns intensity I_i in [0,1], valence V_i in [-1,1], and direction D_i in [-1,1] or an unknown value. Intensity denotes strength of feeling rather than physical activity or arousal. Valence runs from unpleasant to pleasant. Direction runs from inward/self-focused to directed toward another person, object, or the world.
 
@@ -77,7 +73,7 @@ The response also contains tone, an ordinal uncertainty judgment, a summary, and
 
 The prompt asks the model to distinguish expressed emotion from negated, hypothetical, quoted, or merely mentioned emotion and to consider metaphor, irony, and speaker changes. These are instructions to the model, not demonstrated guarantees.
 
-### 3.2 Validation and recovery
+### Validation and recovery
 
 Local validation checks response structure, IDs, numeric ranges, directional consistency, and evidence correspondence. Evidence must resolve to source wording; limited normalization accommodates formatting differences without introducing fuzzy semantic matching. Signal words must be supported by the quoted evidence. Nearby context is supplied for interpretation but is not a valid substitute for evidence in the target segment.
 
@@ -85,11 +81,11 @@ Ordinary analysis batches contain up to six units under an 18,000-character targ
 
 Valid results are retained when a neighboring segment fails. Failed evidence may be repaired through source-word selection. Passage-specific response or repair failures are marked for review and processing continues. Provider, account, transport, or certificate failures stop the run rather than being misclassified as textual failures. Stop is cooperative; an active network request can take up to its 150-second timeout to return. No fallback emotional scores are fabricated.
 
-### 3.3 Segmentation
+### Segmentation
 
 Sentence analysis is opt-in. The local heuristic recognizes common English, Arabic, and Chinese terminal punctuation, selected abbreviations, decimal patterns, and closing punctuation. It is not a trained multilingual sentence parser. Dialogue, unusual abbreviations, poetry, and punctuation-free text can be segmented imperfectly. Changing analysis granularity starts a separate analysis; saved metadata identifies the segmentation mode even where legacy fields retain names such as `paragraphs`.
 
-## 4. Emotional geometry and PCA
+## Emotional geometry and PCA
 
 The primary plot places each eligible text segment at a point with three coordinates. The horizontal x coordinate is valence, ranging from unpleasant (-1) to pleasant (+1). The y coordinate is emotional direction, ranging from inward or self-focused (-1) to directed toward another person, object, or the world (+1). The z coordinate represents emotional intensity: the original intensity score is doubled and then reduced by one, so an intensity of 0 appears at -1, an intensity of 0.5 at 0, and an intensity of 1 at +1.
 
@@ -105,7 +101,7 @@ PCA operates on the three existing scores, not on text embeddings. Each nonconst
 
 The evolving-object view fits PCA once to its full snapshot and retains the same basis and display scale across frames. This avoids apparent motion caused solely by refitting the coordinate system at each time step.
 
-## 5. Solid objects, curved surfaces and evolution
+## Solid objects, curved surfaces and evolution
 
 Three constructions are implemented:
 
@@ -130,7 +126,7 @@ $$W=\bigcup_{i=1}^{N-1}S_i\times[\tau_i,\tau_{i+1}),$$
 
 plus the final slice at the endpoint. This is text-order evolution, not elapsed reading time or a projected 4D convex hull. Topology can change between slices, and unmatched vertices are not interpolated.
 
-## 6. Multilingual idioms and dream imagery
+## Multilingual idioms and dream imagery
 
 Idiom scanning is a separate workflow. It distinguishes possible direct use, transformed expressions, and imagery echoes. One request proposes canonical expressions; local retrieval grounds candidates in available dictionary entries; a subsequent request verifies retrieved candidates against the passage. Known dictionary IDs and source quotes are checked locally.
 
@@ -142,9 +138,9 @@ An image such as someone taking a goat could be proposed as an echo of “get yo
 
 *Figure 4. Idiom workflow. A literal image alone is not proof of an idiom; retrieved expressions and quoted evidence support hypotheses with alternative readings.*
 
-## 7. Emotional shape transfer
+## Emotional shape transfer
 
-### 7.1 Alignment and objective
+### Alignment and objective
 
 Transfer snapshots the source analysis directly from memory. No mesh export is required. It uses the raw emotional trajectory, not PCA coordinates, a convex hull, Loop-smoothed surface, or chosen surface color.
 
@@ -158,7 +154,7 @@ $$e_j=\frac{\lVert c_j-q_j\rVert_2}{2\sqrt{3}}.$$
 
 This normalizes distance by the cube diagonal. It is not a calibrated measure of literary quality. Resampling trajectories does not guarantee equal hulls, volume, or topology.
 
-### 7.2 Generation, review and selection
+### Generation, review and selection
 
 The workflow scores the original target, generates a revision, reviews it, scores the candidate without supplying desired coordinates to the scorer, and finally scores the assembled result in its revised neighboring context. One or two revision attempts can be selected. A second attempt receives feedback from the first. The original, requested, and revised trajectories are displayed separately.
 
@@ -166,7 +162,7 @@ The workflow scores the original target, generates a revision, reviews it, score
 
 **Preserve meaning** requires a review with no semantic concerns, unchanged numeric content under the local check, supported direction, and a lower distance than the current best. The original or a prior accepted candidate remains when no candidate qualifies. Neither policy is a global optimization procedure or a guarantee of an exact emotional match. The reviewer and scorer can share model biases; a separate API call does not constitute independent human validation.
 
-### 7.3 Long documents, boundaries and failures
+### Long documents, boundaries and failures
 
 There is no fixed document-length or unit-count cap in transfer preparation. Oversized units are divided internally into passages of at most 3,000 characters, preferring sentence boundaries and then whitespace. Target request batches use up to six units and a 6,000-character text budget; surrounding context and structured metadata add to actual request size. Users load and export one document. Original separators are retained between spans; replacement text can introduce additional sentence or paragraph boundaries within a span. The entire replacement is scored under its original ID. A subsequent sentence-level reanalysis may therefore produce a different number of points.
 
@@ -174,7 +170,7 @@ A normal one-attempt batch uses approximately five model calls before correction
 
 Passage-specific failures trigger bounded batch isolation. Persistently failing passages are flagged, retaining the original or an accepted earlier revision, and later passages continue automatically. Final-scoring failures preserve the revision but leave its earlier score provisional. Report records distinguish these failures from completed verification. Provider/transport failures and explicit cancellation still stop processing.
 
-## 8. Persistence and exports
+## Persistence and exports
 
 | Artifact | Purpose and contents |
 | --- | --- |
@@ -189,7 +185,7 @@ Transfer checkpoints can be saved during processing and reopened without an acti
 
 Compact evolution export avoids calculating meshes and retains complete reconstruction data. Sampled-mesh export is capped at 60 frames, 1,500 source points per sampled frame, 20,000 triangles per frame, and 250,000 triangles overall. It streams output and retains at most one calculated mesh at a time. Export pauses playback and supports cancellation; a native triangulation must finish before cancellation can take effect. Current evolution exports leave hypervolume uncomputed rather than running every slice merely to obtain that scalar.
 
-## 9. Privacy, dependencies and distribution
+## Privacy, dependencies and distribution
 
 API keys are held in process memory and excluded from app-generated sessions, checkpoints and exports. Text and bounded context are sent to the selected inference provider; OpenAI requests set `store=false`. This setting alone is not a statement about every provider retention policy. Local artifacts contain original text, generated drafts, evidence and potentially sensitive analysis and should be handled accordingly. No analytics or automatic cloud session storage is implemented.
 
@@ -199,7 +195,7 @@ The release workflow builds the app, verifies its signature and native deploymen
 
 Apple accepted the v0.9.10 submission (`0e9fddd1-f38c-4df4-9913-52fab7f86239`); ticket stapling and validation succeeded, and Gatekeeper assessed the application as an accepted Notarized Developer ID app. All 106 inspected Mach-O binaries met the arm64/macOS deployment-target checks. Provider connectivity checks reached the services without credentials (HTTP 401/403); these establish connectivity, not authenticated inference access.
 
-## 10. Verification and research limitations
+## Verification and research limitations
 
 For this release, **93 automated tests passed**. Offline native smoke tests exercise startup, controls, plots, idiom annotations, geometry/evolution exports, shape transfer and checkpoint reopening. Additional native checks verified saving during an active simulated transfer and switching Light/Dark appearance across existing and newly opened windows while retaining data colors. The tests use synthetic fixtures and mocked model responses; no benchmark of live-model interpretation or revision quality is claimed.
 
@@ -209,7 +205,7 @@ A rigorous future evaluation should measure: inter-reader agreement on emotional
 
 Emotional Atlas should therefore be understood as an inspectable experimental instrument for reading and transformation. Its strongest technical commitments are traceable source evidence, explicit geometric definitions, visible selection policies, and exportable records—not objective measurement of a person's emotions.
 
-## 11. Implementation references
+## Implementation references
 
 The report corresponds to version 0.9.10 in this repository. Primary implementation and operational documentation:
 

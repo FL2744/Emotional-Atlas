@@ -48,37 +48,17 @@ interpretive accuracy or transfer efficacy.
 \end{abstract}
 \keywords{emotional geometry, text analysis, shape transfer, multilingual idioms, visualization}
 \maketitle
-\section{Scope and design}\label{scope-and-design}
+\section{Purpose and Research Context}\label{scope-and-design}
 
-The application supports exploratory reading and computational
-experimentation. Its central unit is a text segment: ordinarily a
-paragraph, optionally a line, or a sentence when granular analysis is
-enabled. The interface preserves a distinction between source text,
-inferred emotional descriptions, derived coordinates, and geometric
-representations. Changing a surface or viewing mode does not change the
-underlying scores.
+Emotional Atlas supports exploratory reading of literature and dream reports by representing changes in emotional interpretation across a text. Its central unit is a segment, ordinarily a paragraph and optionally a line or sentence. The application keeps the source passage, inferred emotional description, numerical coordinates, and rendered geometry distinct so that a reader can inspect how an interpretation becomes a visual pattern. The aim is to make those transformations available for comparison and experimentation rather than to assign a unique emotional meaning to a text.
 
-The main window contains text input, provider controls, the primary
-scatter plot, results, and evidence inspection. Expanded plots,
-solid/evolving objects, and shape transfer use separate windows. Dark
-mode is the startup default; a Light option changes interface
-backgrounds and text across open and newly created windows. Valence
-colors, yellow idiom markers, and user-selected surface colors remain
-distinct from interface appearance.
+Dimensional accounts of affect provide a basis for asking what such coordinates can represent. Russell's circumplex organizes affect around valence and arousal \cite{russell}, while Bradley and Lang's Self-Assessment Manikin includes pleasure, arousal, and dominance in human ratings \cite{sam}. Word-level norms from Warriner and colleagues and the NRC VAD lexicon offer empirical reference points \cite{warriner,vad}. GoEmotions supplies a complementary categorical annotation scheme \cite{goemotions}. These resources motivate interpretable axes and explicit annotation choices, while also marking a limit: ratings of words or annotated stimuli do not validate an LLM's interpretation of an entire paragraph or dream, and emotional categories are not interchangeable with continuous dimensions.
 
-This report describes implemented functionality. It does not claim that
-emotional meaning has a unique geometric form, that a dream image has a
-determinate symbolic meaning, or that generated revisions preserve facts
-in flexible mode.
+The interest in movement across segments connects the application to research on emotional trajectories in literary corpora \cite{arcs}. Such work motivates examining text order without assuming universal narrative templates. Emotional Atlas displays a primary scatter plot and provides expanded views, solid objects, and evolving surfaces for inspecting the same underlying analysis. PCA offers a linear summary of variation \cite{pca}, making the projection basis and retained variance important when comparing trajectories. Alpha-shape research provides a mathematical comparison for constructing boundaries from point sets \cite{alphashapes}; a rendered exterior remains a geometric interpretation of the points, not an independent measurement of emotional meaning or evidence that every surface mode implements an alpha shape.
 
+The same distinction between interpretation and representation carries into rewriting and idiom exploration. Style-transfer research treats attribute control, content preservation, and fluency as separate evaluation concerns \cite{style}. Emotional shape transfer uses a source trajectory to guide a target rewrite, requiring those checks alongside coordinate agreement, especially when flexible revision permits semantic change. Multilingual idiomaticity benchmarks study expressions in context \cite{idioms}, whereas inferring an idiom from dream imagery reaches beyond that setting. An image resembling an idiom's literal wording is therefore presented as a candidate for reader review, not proof of an intended meaning.
 
-\subsection{Research context}
-
-Dimensional models provide a research context for emotional coordinates. Russell's circumplex organizes affect around valence and arousal \cite{russell}, while Bradley and Lang's Self-Assessment Manikin includes pleasure, arousal, and dominance in human ratings \cite{sam}. Word-level affective norms from Warriner and colleagues \cite{warriner} and the NRC VAD lexicon \cite{vad} provide empirical reference points. These resources concern annotated stimuli and populations; they do not validate an LLM's scores for a paragraph or a dream. GoEmotions offers a complementary categorical annotation scheme \cite{goemotions}, illustrating why categories and continuous dimensions should not be treated as interchangeable measurements.
-
-Reagan and colleagues analyze emotional trajectories in a literary corpus \cite{arcs}. Their study motivates examining change over text order, but it does not establish universal narrative templates or validate the present segmentation and scoring procedure. PCA summarizes variation through a linear projection \cite{pca}; the retained variance and shared projection basis therefore matter when comparing displayed trajectories. Alpha-shape research formalizes families of boundaries constructed from point sets \cite{alphashapes}. It offers a geometric comparison for the app's solid-object views, not evidence that a rendered boundary measures emotional meaning or that every surface option implements an alpha shape.
-
-Text style-transfer research separates attribute control from content preservation and fluency \cite{style}. Emotional shape transfer similarly needs separate checks of coordinate agreement, readability, and semantic change, especially when flexible rewriting is enabled. Multilingual idiomaticity benchmarks evaluate expressions in context \cite{idioms}. Inferring an idiom from dream imagery extends beyond that benchmark setting: an image resembling a literal expression is a hypothesis for reader review, not proof of the dreamer's intention.
+Within this scope, the main window provides text input, provider controls, the scatter plot, results, and evidence inspection; separate windows support expanded plotting, object views, and shape transfer. Dark and light interface modes preserve the distinct colors used for valence, idiom markers, and selected surfaces. Changing those views does not change the underlying scores. The report describes these implemented workflows and their computational assumptions, while reserving claims of interpretive accuracy and transfer effectiveness for evaluation against appropriate human judgments.
 
 \section{Architecture and execution}\label{architecture-and-execution}
 
