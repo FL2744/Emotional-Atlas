@@ -22,13 +22,26 @@
 \raggedbottom
 
 \geometry{left=1in,right=1in,top=0.75in,bottom=0.65in,includeheadfoot}
+
+% Keep display equations evenly separated from the surrounding prose.
+% Override the short-line skips as well as the ordinary display skips.
+\makeatletter
+\g@addto@macro\normalsize{%
+  \setlength{\abovedisplayskip}{7pt}%
+  \setlength{\belowdisplayskip}{7pt}%
+  \setlength{\abovedisplayshortskip}{7pt}%
+  \setlength{\belowdisplayshortskip}{7pt}%
+}
+\makeatother
+\postdisplaypenalty=10000
+
 \begin{document}
 \title{Emotional Atlas: Emotional Geometry, Textual Evolution, and Shape-Guided Revision}
 \author{William Taggart}
 \affiliation{\department{Modern and Classical Languages and Literatures}
 \institution{Virginia Tech}\city{Blacksburg}\state{Virginia}\country{USA}}
 \email{wtaggart@vt.edu}
-\subtitle{Technical report on version 0.9.10; November 13, 2026}
+\subtitle{Technical report on version 0.9.10; November 14, 2026}
 \begin{abstract}
 Emotional Atlas is a desktop environment for examining emotional
 movement in literary texts and dream reports. It combines large language
@@ -50,15 +63,19 @@ interpretive accuracy or transfer efficacy.
 \maketitle
 \section{Purpose and Research Context}\label{scope-and-design}
 
-Emotional Atlas supports exploratory reading of literature and dream reports by representing changes in emotional interpretation across a text. Its central unit is a segment, ordinarily a paragraph and optionally a line or sentence. The application keeps the source passage, inferred emotional description, numerical coordinates, and rendered geometry distinct so that a reader can inspect how an interpretation becomes a visual pattern. The aim is to make those transformations available for comparison and experimentation rather than to assign a unique emotional meaning to a text.
+Emotional Atlas supports exploratory reading of literature and dream reports by making changes in emotional interpretation visible across a text. A reader begins with passages, ordinarily paragraphs and optionally lines or sentences, and examines how their inferred emotional qualities form a pattern. The application keeps the source passage, emotional description, numerical coordinates, and rendered geometry available for inspection throughout this process. Its purpose is to help readers compare interpretations and experiment with their consequences while retaining a way back to the textual evidence.
 
-Dimensional accounts of affect provide a basis for asking what such coordinates can represent. Russell's circumplex organizes affect around valence and arousal \cite{russell}, while Bradley and Lang's Self-Assessment Manikin includes pleasure, arousal, and dominance in human ratings \cite{sam}. Word-level norms from Warriner and colleagues and the NRC VAD lexicon offer empirical reference points \cite{warriner,vad}. GoEmotions supplies a complementary categorical annotation scheme \cite{goemotions}. These resources motivate interpretable axes and explicit annotation choices, while also marking a limit: ratings of words or annotated stimuli do not validate an LLM's interpretation of an entire paragraph or dream, and emotional categories are not interchangeable with continuous dimensions.
+Representing an interpretation numerically first raises the question of what its axes can mean. Russell's circumplex organizes affect around valence and arousal, while Bradley and Lang's Self-Assessment Manikin includes pleasure, arousal, and dominance in human ratings \cite{russell,sam}. These dimensional approaches provide a starting point for expressing differences in affect. Word-level norms from Warriner and colleagues and the NRC VAD lexicon give empirical reference points for such dimensions, whereas GoEmotions offers a complementary categorical annotation scheme \cite{warriner,vad,goemotions}. Together, these resources motivate interpretable axes and explicit annotation choices. Their different units of analysis also matter: a rating assigned to a word or annotated stimulus does not establish the accuracy of an LLM's interpretation of a paragraph or dream, and a category cannot simply be substituted for a continuous score.
 
-The interest in movement across segments connects the application to research on emotional trajectories in literary corpora \cite{arcs}. Such work motivates examining text order without assuming universal narrative templates. Emotional Atlas displays a primary scatter plot and provides expanded views, solid objects, and evolving surfaces for inspecting the same underlying analysis. PCA offers a linear summary of variation \cite{pca}, making the projection basis and retained variance important when comparing trajectories. Alpha-shape research provides a mathematical comparison for constructing boundaries from point sets \cite{alphashapes}; a rendered exterior remains a geometric interpretation of the points, not an independent measurement of emotional meaning or evidence that every surface mode implements an alpha shape.
+Once interpretations are assigned to successive segments, the focus shifts from individual scores to movement through the text. Research on emotional trajectories in literary corpora provides a precedent for examining that progression \cite{arcs}. Emotional Atlas takes up this interest in text order as an exploratory question, without assuming that every work follows a universal narrative template. Its primary scatter plot, expanded views, solid objects, and evolving surfaces offer different ways to inspect the same underlying analysis. The usefulness of these views depends in turn on understanding what each geometric transformation preserves and what it changes.
 
-The same distinction between interpretation and representation carries into rewriting and idiom exploration. Style-transfer research treats attribute control, content preservation, and fluency as separate evaluation concerns \cite{style}. Emotional shape transfer uses a source trajectory to guide a target rewrite, requiring those checks alongside coordinate agreement, especially when flexible revision permits semantic change. Multilingual idiomaticity benchmarks study expressions in context \cite{idioms}, whereas inferring an idiom from dream imagery reaches beyond that setting. An image resembling an idiom's literal wording is therefore presented as a candidate for reader review, not proof of an intended meaning.
+For example, PCA provides a linear summary of variation, so a comparison between projected trajectories must account for the projection basis and retained variance \cite{pca}. Constructing a surface introduces a different set of choices about how points should define an exterior. Alpha-shape research supplies a mathematical reference for this boundary-construction problem \cite{alphashapes}, although the application's surface modes use their own specified constructions. A rendered exterior consequently expresses a geometric interpretation of the scores; it supplies neither an independent measurement of emotional meaning nor evidence that every surface mode implements an alpha shape. Keeping those distinctions visible allows readers to use the geometry without mistaking the display for additional textual evidence.
 
-Within this scope, the main window provides text input, provider controls, the scatter plot, results, and evidence inspection; separate windows support expanded plotting, object views, and shape transfer. Dark and light interface modes preserve the distinct colors used for valence, idiom markers, and selected surfaces. Changing those views does not change the underlying scores. The report describes these implemented workflows and their computational assumptions, while reserving claims of interpretive accuracy and transfer effectiveness for evaluation against appropriate human judgments.
+The trajectory can also serve as a guide for rewriting, extending the workflow from interpretation to transformation. Here, style-transfer research helps frame the evaluation problem by separating attribute control, content preservation, and fluency \cite{style}. Emotional shape transfer applies a source trajectory to a target text, bringing these concerns into relation with coordinate agreement. In particular, a revision that approaches the requested coordinates may also alter meaning, especially under the flexible revision policy. Assessing the transformation therefore requires reading the revised passage as well as comparing its scores.
+
+A similar need for contextual judgment arises in the idiom workflow. Multilingual idiomaticity benchmarks examine expressions in context \cite{idioms}, providing a reference for identifying direct or transformed idiomatic usage. Inferring an idiom from dream imagery extends beyond that task: an image may resemble an expression's literal wording without carrying its conventional meaning. Emotional Atlas therefore presents such imagery echoes as candidates for reader review, accompanied by evidence and alternative interpretations, rather than treating the resemblance as proof of an intended meaning.
+
+Across these workflows, the organizing principle is to make the steps from text to interpretation, representation, and revision available for scrutiny. The main window brings together input, provider controls, the scatter plot, results, and evidence inspection; separate windows support expanded plotting, object views, and shape transfer. Light and dark modes retain the colors used for valence, idiom markers, and selected surfaces, while changes to the view leave the underlying scores intact. The following sections explain how these operations are implemented and what their computational assumptions permit. Claims of interpretive accuracy or effective transfer require a further step: evaluation against appropriate human judgments.
 
 \section{Architecture and execution}\label{architecture-and-execution}
 
@@ -286,17 +303,13 @@ color is shaded to convey depth; OBJ export includes a corresponding MTL
 file.
 
 The fourth coordinate is normalized text order:
-
 \[\tau_i=\frac{i-1}{N-1},\]
-
 with zero used for a one-unit text. Cumulative evolution includes
 eligible points through i; moving-window evolution includes positions
 \(\max(1,i-w+1)\) through i. Missing coordinates still occupy timeline
 positions. The displayed sequence is a family of 3D slices \(S_i\),
 conceptually defining:
-
 \[W=\bigcup_{i=1}^{N-1}S_i\times[\tau_i,\tau_{i+1}),\]
-
 plus the final slice at the endpoint. This is text-order evolution, not
 elapsed reading time or a projected 4D convex hull. Topology can change
 between slices, and unmatched vertices are not interpolated.
@@ -352,14 +365,10 @@ over normalized source-unit positions. Gaps are interpolated and
 positions beyond the known range clamp to the nearest endpoint. A target
 with M processing units samples \(t_j=(j-1)/(M-1)\); a one-unit target
 samples \(t=0.5\). With baseline target point \(b_j\) and strength s:
-
 \[q_j=(1-s)b_j+s\,p(t_j).\]
-
 If the baseline lacks a supported direction, the complete baseline point
 is unavailable and \(q_j\) is set to \(p(t_j)\). Candidate distance is:
-
 \[e_j=\frac{\lVert c_j-q_j\rVert_2}{2\sqrt{3}}.\]
-
 This normalizes distance by the cube diagonal. It is not a calibrated
 measure of literary quality. Resampling trajectories does not guarantee
 equal hulls, volume, or topology.
@@ -588,7 +597,7 @@ implementation and operational documentation:
 William Taggart. 2026. Emotional Atlas: Emotional Geometry, Textual
 Evolution, and Shape-Guided Revision. Technical report on software
 version 0.9.10. Modern and Classical Languages and Literatures, Virginia
-Tech. November 13, 2026.
+Tech. November 14, 2026.
 \url{https://github.com/FL2744/Emotional-Atlas}
 
 \section*{AI-use disclosure}
