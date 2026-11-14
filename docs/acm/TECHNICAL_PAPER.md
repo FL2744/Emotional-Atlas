@@ -219,10 +219,6 @@ The report corresponds to version 0.9.10 in this repository. Primary implementat
 - [Shape-transfer engine](https://github.com/FL2744/Emotional-Atlas/blob/main/shape_transfer.py), [transfer guide](https://github.com/FL2744/Emotional-Atlas/blob/main/docs/shape-transfer.md), and [checkpoint implementation](https://github.com/FL2744/Emotional-Atlas/blob/main/transfer_session.py).
 - [Native smoke checks](https://github.com/FL2744/Emotional-Atlas/blob/main/smoke.py), [release workflow](https://github.com/FL2744/Emotional-Atlas/blob/main/scripts/release_notarized.sh), and [release history](https://github.com/FL2744/Emotional-Atlas/blob/main/CHANGELOG.md).
 
-## Suggested citation
-
-William Taggart. 2026. Emotional Atlas: Emotional Geometry, Textual Evolution, and Shape-Guided Revision. Technical report on software version 0.9.10. Modern and Classical Languages and Literatures, Virginia Tech. November 13, 2026. https://github.com/FL2744/Emotional-Atlas
-
 ## AI-use disclosure
 
 This project was created with assistance from GPT-6 Astra and Codex. AI tools supported software development, testing, and drafting and revision of this technical report. William Taggart is responsible for the research decisions and final software and documentation. AI assistance does not constitute independent validation of the implementation or its scientific claims; the verification evidence and limitations are stated separately in this report.
@@ -249,3 +245,6 @@ This project was created with assistance from GPT-6 Astra and Codex. AI tools su
 
 10. Harish Tayyar Madabushi, Edward Gow-Smith, Marcos Garcia, Carolina Scarton, Marco Idiart, Aline Villavicencio (2022). [SemEval-2022 Task 2: Multilingual Idiomaticity Detection and Sentence Embedding](https://doi.org/10.18653/v1/2022.semeval-1.13). Proceedings of the 16th International Workshop on Semantic Evaluation (SemEval-2022). DOI: 10.18653/v1/2022.semeval-1.13.
 
+## Suggested citation
+
+William Taggart. 2026. Emotional Atlas: Emotional Geometry, Textual Evolution, and Shape-Guided Revision. Technical report on software version 0.9.10. Modern and Classical Languages and Literatures, Virginia Tech. November 13, 2026. https://github.com/FL2744/Emotional-Atlas
