@@ -7,7 +7,7 @@
 \usetikzlibrary{positioning}
 \DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,fontsize=\small}
 \providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\usepackage{graphicx}
+\usepackage{graphicx,float}
 \begin{document}
 \title{Emotional Atlas: Emotional Geometry, Textual Evolution, and Shape-Guided Revision}
 \author{William Taggart}
@@ -56,6 +56,30 @@ This report describes implemented functionality. It does not claim that
 emotional meaning has a unique geometric form, that a dream image has a
 determinate symbolic meaning, or that generated revisions preserve facts
 in flexible mode.
+
+\section{Application interface}
+The application exposes its principal operations through the following workspaces and controls.
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.70\textheight,keepaspectratio]{figures/screenshot-01.png}
+\caption{Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence.}
+\Description{Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence.}
+\label{fig:app-screen-1}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.70\textheight,keepaspectratio]{figures/screenshot-02.png}
+\caption{Solid-object window showing the outermost-point surface, labeled emotional axes, mathematical description, and export controls for the saved analysis.}
+\Description{Solid-object window showing the outermost-point surface, labeled emotional axes, mathematical description, and export controls for the saved analysis.}
+\label{fig:app-screen-2}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.70\textheight,keepaspectratio]{figures/screenshot-03.png}
+\caption{PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits.}
+\Description{PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits.}
+\label{fig:app-screen-3}
+\end{figure}
 
 \section{Architecture and execution}\label{architecture-and-execution}
 
@@ -204,13 +228,7 @@ analysis granularity starts a separate analysis; saved metadata
 identifies the segmentation mode even where legacy fields retain names
 such as \nolinkurl{paragraphs}.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{figures/illustration-02.pdf}
-\caption{Emotional coordinate mapping. Intensity is centered for display, while an unknown direction prevents construction of a complete point. PCA, when used, acts on these scores rather than token embeddings.}
-\Description{Three scores define a display point. Emotional coordinate mapping. Intensity is centered for display, while an unknown direction prevents construction of a complete point. PCA, when used, acts on these scores rather than token embeddings.}
-\label{fig:illustration-2}
-\end{figure}
+
 
 \section{Emotional geometry and PCA}\label{emotional-geometry-and-pca}
 
@@ -298,13 +316,7 @@ plus the final slice at the endpoint. This is text-order evolution, not
 elapsed reading time or a projected 4D convex hull. Topology can change
 between slices, and unmatched vertices are not interpolated.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{figures/illustration-03.pdf}
-\caption{Object-view schematic. The three surface constructions and optional smoothing do not change the underlying emotional scores. Evolution denotes text-order slices, not a four-dimensional convex hull.}
-\Description{Objects are constructions from the same points. Object-view schematic. The three surface constructions and optional smoothing do not change the underlying emotional scores. Evolution denotes text-order slices, not a four-dimensional convex hull.}
-\label{fig:illustration-3}
-\end{figure}
+
 
 \section{Multilingual idioms and dream
 imagery}\label{multilingual-idioms-and-dream-imagery}
@@ -424,13 +436,7 @@ provisional. Report records distinguish these failures from completed
 verification. Provider/transport failures and explicit cancellation
 still stop processing.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{figures/illustration-05.pdf}
-\caption{Transfer schematic. Source geometry is sampled from the in-memory analysis. Candidate selection depends on the configured policy and assessed coordinates, with resumable audit records.}
-\Description{Shape transfer uses the raw trajectory. Transfer schematic. Source geometry is sampled from the in-memory analysis. Candidate selection depends on the configured policy and assessed coordinates, with resumable audit records.}
-\label{fig:illustration-5}
-\end{figure}
+
 
 \section{Persistence and exports}\label{persistence-and-exports}
 

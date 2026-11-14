@@ -1,0 +1,35 @@
+[
+  {
+    "file": "figures/screenshot-01.png",
+    "source": "emotional-atlas-01.jpg",
+    "crop": [
+      12,
+      90,
+      2755,
+      1870
+    ],
+    "caption": "Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence."
+  },
+  {
+    "file": "figures/screenshot-02.png",
+    "source": "emotional-atlas-02.jpg",
+    "crop": [
+      20,
+      65,
+      2180,
+      1700
+    ],
+    "caption": "Solid-object window showing the outermost-point surface, labeled emotional axes, mathematical description, and export controls for the saved analysis."
+  },
+  {
+    "file": "figures/screenshot-03.png",
+    "source": "emotional-atlas-03.jpg",
+    "crop": [
+      28,
+      30,
+      1010,
+      1110
+    ],
+    "caption": "PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits."
+  }
+]

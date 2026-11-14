@@ -1,37 +1,41 @@
-[
-  {
-    "number": 1,
-    "title": "From text to evidence-backed coordinates",
-    "caption": "Analysis pipeline. Model judgments are locally validated against source evidence before eligible segments enter geometry; validation is not evidence of psychometric accuracy.",
-    "section_preceded": "Emotional inference and evidence",
-    "provenance": "Explanatory schematic derived from the report; not a screenshot or new experiment."
-  },
-  {
-    "number": 2,
-    "title": "Three scores define a display point",
-    "caption": "Emotional coordinate mapping. Intensity is centered for display, while an unknown direction prevents construction of a complete point. PCA, when used, acts on these scores rather than token embeddings.",
-    "section_preceded": "Emotional geometry and PCA",
-    "provenance": "Explanatory schematic derived from the report; not a screenshot or new experiment."
-  },
-  {
-    "number": 3,
-    "title": "Objects are constructions from the same points",
-    "caption": "Object-view schematic. The three surface constructions and optional smoothing do not change the underlying emotional scores. Evolution denotes text-order slices, not a four-dimensional convex hull.",
-    "section_preceded": "Multilingual idioms and dream imagery",
-    "provenance": "Explanatory schematic derived from the report; not a screenshot or new experiment."
-  },
-  {
-    "number": 4,
-    "title": "Grounding idiom and dream-imagery candidates",
-    "caption": "Idiom workflow. A literal image alone is not proof of an idiom; retrieved expressions and quoted evidence support hypotheses with alternative readings.",
-    "section_preceded": "Emotional shape transfer",
-    "provenance": "Explanatory schematic derived from the report; not a screenshot or new experiment."
-  },
-  {
-    "number": 5,
-    "title": "Shape transfer uses the raw trajectory",
-    "caption": "Transfer schematic. Source geometry is sampled from the in-memory analysis. Candidate selection depends on the configured policy and assessed coordinates, with resumable audit records.",
-    "section_preceded": "Persistence and exports",
-    "provenance": "Explanatory schematic derived from the report; not a screenshot or new experiment."
-  }
-]
+{
+  "screenshots": [
+    {
+      "file": "figures/screenshot-01.png",
+      "source": "emotional-atlas-01.jpg",
+      "crop": [
+        12,
+        90,
+        2755,
+        1870
+      ],
+      "caption": "Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence."
+    },
+    {
+      "file": "figures/screenshot-02.png",
+      "source": "emotional-atlas-02.jpg",
+      "crop": [
+        20,
+        65,
+        2180,
+        1700
+      ],
+      "caption": "Solid-object window showing the outermost-point surface, labeled emotional axes, mathematical description, and export controls for the saved analysis."
+    },
+    {
+      "file": "figures/screenshot-03.png",
+      "source": "emotional-atlas-03.jpg",
+      "crop": [
+        28,
+        30,
+        1010,
+        1110
+      ],
+      "caption": "PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits."
+    }
+  ],
+  "retained_diagrams": [
+    1,
+    4
+  ]
+}
