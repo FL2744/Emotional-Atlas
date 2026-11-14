@@ -2,7 +2,7 @@
 
 <div align="left">
 
-**Technical paper:** [PDF](docs/acm/Emotional-Atlas.pdf) · [Markdown](docs/TECHNICAL_REPORT.md) · [LaTeX](docs/acm/main.tex) · [Complete LaTeX package](docs/acm/Emotional-Atlas-ACM-source.zip) · [Markdown](docs/acm/TECHNICAL_PAPER.md) · [Figures and source](docs/acm/)
+**Technical paper:** [PDF](docs/acm/Emotional-Atlas.pdf) · [Markdown](docs/TECHNICAL_REPORT.md) · [LaTeX](docs/acm/main.tex) · [Complete LaTeX package](docs/acm/Emotional-Atlas-source.zip) · [Markdown](docs/acm/TECHNICAL_PAPER.md) · [Figures and source](docs/acm/)
 
 </div>
 
