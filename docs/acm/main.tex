@@ -72,6 +72,14 @@ determinate symbolic meaning, or that generated revisions preserve facts
 in flexible mode.
 
 
+\subsection{Research context}
+
+Dimensional models provide a research context for emotional coordinates. Russell's circumplex organizes affect around valence and arousal \cite{russell}, while Bradley and Lang's Self-Assessment Manikin includes pleasure, arousal, and dominance in human ratings \cite{sam}. Word-level affective norms from Warriner and colleagues \cite{warriner} and the NRC VAD lexicon \cite{vad} provide empirical reference points. These resources concern annotated stimuli and populations; they do not validate an LLM's scores for a paragraph or a dream. GoEmotions offers a complementary categorical annotation scheme \cite{goemotions}, illustrating why categories and continuous dimensions should not be treated as interchangeable measurements.
+
+Reagan and colleagues analyze emotional trajectories in a literary corpus \cite{arcs}. Their study motivates examining change over text order, but it does not establish universal narrative templates or validate the present segmentation and scoring procedure. PCA summarizes variation through a linear projection \cite{pca}; the retained variance and shared projection basis therefore matter when comparing displayed trajectories. Alpha-shape research formalizes families of boundaries constructed from point sets \cite{alphashapes}. It offers a geometric comparison for the app's solid-object views, not evidence that a rendered boundary measures emotional meaning or that every surface option implements an alpha shape.
+
+Text style-transfer research separates attribute control from content preservation and fluency \cite{style}. Emotional shape transfer similarly needs separate checks of coordinate agreement, readability, and semantic change, especially when flexible rewriting is enabled. Multilingual idiomaticity benchmarks evaluate expressions in context \cite{idioms}. Inferring an idiom from dream imagery extends beyond that benchmark setting: an image resembling a literal expression is a hypothesis for reader review, not proof of the dreamer's intention.
+
 \section{Architecture and execution}\label{architecture-and-execution}
 
 The application is written in Python with Tk/ttk. Network inference runs
@@ -555,15 +563,6 @@ technical commitments are traceable source evidence, explicit geometric
 definitions, visible selection policies, and exportable records---not
 objective measurement of a person's emotions.
 
-\section*{AI-use disclosure}
-This project was created with assistance from GPT-6 Astra and Codex. AI
-tools supported software development, testing, and drafting and revision
-of this technical report. William Taggart is responsible for the
-research decisions and final software and documentation. AI assistance
-does not constitute independent validation of the implementation or its
-scientific claims; the verification evidence and limitations are stated
-separately in this report.
-
 \section{Implementation references}\label{implementation-references}
 
 The report corresponds to version 0.9.10 in this repository. Primary
@@ -611,5 +610,18 @@ Evolution, and Shape-Guided Revision. Technical report on software
 version 0.9.10. Modern and Classical Languages and Literatures, Virginia
 Tech. November 13, 2026.
 \url{https://github.com/FL2744/Emotional-Atlas}
+
+\section*{AI-use disclosure}
+This project was created with assistance from GPT-6 Astra and Codex. AI
+tools supported software development, testing, and drafting and revision
+of this technical report. William Taggart is responsible for the
+research decisions and final software and documentation. AI assistance
+does not constitute independent validation of the implementation or its
+scientific claims; the verification evidence and limitations are stated
+separately in this report.
+
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
 
 \end{document}

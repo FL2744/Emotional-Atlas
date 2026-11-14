@@ -21,6 +21,14 @@ The main window contains text input, provider controls, the primary scatter plot
 
 This report describes implemented functionality. It does not claim that emotional meaning has a unique geometric form, that a dream image has a determinate symbolic meaning, or that generated revisions preserve facts in flexible mode.
 
+### Research context
+
+Dimensional models provide a research context for emotional coordinates. Russell's circumplex organizes affect around valence and arousal [A circumplex model of affect.](https://doi.org/10.1037/h0077714), while Bradley and Lang's Self-Assessment Manikin includes pleasure, arousal, and dominance in human ratings [Measuring emotion: The self-assessment manikin and the semantic differential](https://doi.org/10.1016/0005-7916(94)90063-9). Word-level affective norms from Warriner and colleagues [Norms of valence, arousal, and dominance for 13,915 English lemmas](https://doi.org/10.3758/s13428-012-0314-x) and the NRC VAD lexicon [Obtaining Reliable Human Ratings of Valence, Arousal, and Dominance for 20,000 English Words](https://doi.org/10.18653/v1/P18-1017) provide empirical reference points. These resources concern annotated stimuli and populations; they do not validate an LLM's scores for a paragraph or a dream. GoEmotions offers a complementary categorical annotation scheme [GoEmotions: A Dataset of Fine-Grained Emotions](https://arxiv.org/abs/2005.00547), illustrating why categories and continuous dimensions should not be treated as interchangeable measurements.
+
+Reagan and colleagues analyze emotional trajectories in a literary corpus [The emotional arcs of stories are dominated by six basic shapes](https://arxiv.org/abs/1606.07772). Their study motivates examining change over text order, but it does not establish universal narrative templates or validate the present segmentation and scoring procedure. PCA summarizes variation through a linear projection [Principal component analysis: a review and recent developments](https://doi.org/10.1098/rsta.2015.0202); the retained variance and shared projection basis therefore matter when comparing displayed trajectories. Alpha-shape research formalizes families of boundaries constructed from point sets [Three-dimensional alpha shapes](https://doi.org/10.1145/174462.156635). It offers a geometric comparison for the app's solid-object views, not evidence that a rendered boundary measures emotional meaning or that every surface option implements an alpha shape.
+
+Text style-transfer research separates attribute control from content preservation and fluency [Deep Learning for Text Style Transfer: A Survey](https://arxiv.org/abs/2011.00416). Emotional shape transfer similarly needs separate checks of coordinate agreement, readability, and semantic change, especially when flexible rewriting is enabled. Multilingual idiomaticity benchmarks evaluate expressions in context [SemEval-2022 Task 2: Multilingual Idiomaticity Detection and Sentence Embedding](https://doi.org/10.18653/v1/2022.semeval-1.13). Inferring an idiom from dream imagery extends beyond that benchmark setting: an image resembling a literal expression is a hypothesis for reader review, not proof of the dreamer's intention.
+
 ## 2. Architecture and execution
 
 The application is written in Python with Tk/ttk. Network inference runs in worker threads, with queued events delivered to the GUI. Geometry and export operations also use background work where implemented. Local plotting, playback, PCA, and saved-result inspection do not require new model requests.
@@ -201,10 +209,6 @@ A rigorous future evaluation should measure: inter-reader agreement on emotional
 
 Emotional Atlas should therefore be understood as an inspectable experimental instrument for reading and transformation. Its strongest technical commitments are traceable source evidence, explicit geometric definitions, visible selection policies, and exportable records—not objective measurement of a person's emotions.
 
-## AI-use disclosure
-
-This project was created with assistance from GPT-6 Astra and Codex. AI tools supported software development, testing, and drafting and revision of this technical report. William Taggart is responsible for the research decisions and final software and documentation. AI assistance does not constitute independent validation of the implementation or its scientific claims; the verification evidence and limitations are stated separately in this report.
-
 ## 11. Implementation references
 
 The report corresponds to version 0.9.10 in this repository. Primary implementation and operational documentation:
@@ -218,3 +222,30 @@ The report corresponds to version 0.9.10 in this repository. Primary implementat
 ## Suggested citation
 
 William Taggart. 2026. Emotional Atlas: Emotional Geometry, Textual Evolution, and Shape-Guided Revision. Technical report on software version 0.9.10. Modern and Classical Languages and Literatures, Virginia Tech. November 13, 2026. https://github.com/FL2744/Emotional-Atlas
+
+## AI-use disclosure
+
+This project was created with assistance from GPT-6 Astra and Codex. AI tools supported software development, testing, and drafting and revision of this technical report. William Taggart is responsible for the research decisions and final software and documentation. AI assistance does not constitute independent validation of the implementation or its scientific claims; the verification evidence and limitations are stated separately in this report.
+
+
+## References
+1. James A. Russell (1980). [A circumplex model of affect.](https://doi.org/10.1037/h0077714). Journal of Personality and Social Psychology. DOI: 10.1037/h0077714.
+
+2. Margaret M. Bradley, Peter J. Lang (1994). [Measuring emotion: The self-assessment manikin and the semantic differential](https://doi.org/10.1016/0005-7916(94)90063-9). Journal of Behavior Therapy and Experimental Psychiatry. DOI: 10.1016/0005-7916(94)90063-9.
+
+3. Amy Beth Warriner, Victor Kuperman, Marc Brysbaert (2013). [Norms of valence, arousal, and dominance for 13,915 English lemmas](https://doi.org/10.3758/s13428-012-0314-x). Behavior Research Methods. DOI: 10.3758/s13428-012-0314-x.
+
+4. Saif Mohammad (2018). [Obtaining Reliable Human Ratings of Valence, Arousal, and Dominance for 20,000 English Words](https://doi.org/10.18653/v1/P18-1017). Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers). DOI: 10.18653/v1/P18-1017.
+
+5. Demszky, Dorottya, Movshovitz-Attias, Dana, Ko, Jeongwoo, Cowen, Alan, Nemade, Gaurav, Ravi, Sujith (2020). [GoEmotions: A Dataset of Fine-Grained Emotions](https://arxiv.org/abs/2005.00547). DOI: 10.48550/arXiv.2005.00547.
+
+6. Reagan, Andrew J., Mitchell, Lewis, Kiley, Dilan, Danforth, Christopher M., Dodds, Peter Sheridan (2016). [The emotional arcs of stories are dominated by six basic shapes](https://arxiv.org/abs/1606.07772). DOI: 10.48550/arXiv.1606.07772.
+
+7. Ian T. Jolliffe, Jorge Cadima (2016). [Principal component analysis: a review and recent developments](https://doi.org/10.1098/rsta.2015.0202). Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences. DOI: 10.1098/rsta.2015.0202.
+
+8. Herbert Edelsbrunner, Ernst P. Mücke (1994). [Three-dimensional alpha shapes](https://doi.org/10.1145/174462.156635). ACM Transactions on Graphics. DOI: 10.1145/174462.156635.
+
+9. Jin, Di, Jin, Zhijing, Hu, Zhiting, Vechtomova, Olga, Mihalcea, Rada (2020). [Deep Learning for Text Style Transfer: A Survey](https://arxiv.org/abs/2011.00416). DOI: 10.48550/arXiv.2011.00416.
+
+10. Harish Tayyar Madabushi, Edward Gow-Smith, Marcos Garcia, Carolina Scarton, Marco Idiart, Aline Villavicencio (2022). [SemEval-2022 Task 2: Multilingual Idiomaticity Detection and Sentence Embedding](https://doi.org/10.18653/v1/2022.semeval-1.13). Proceedings of the 16th International Workshop on Semantic Evaluation (SemEval-2022). DOI: 10.18653/v1/2022.semeval-1.13.
+
