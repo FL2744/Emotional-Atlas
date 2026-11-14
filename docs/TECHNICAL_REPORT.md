@@ -13,20 +13,6 @@ Email: [wtaggart@vt.edu](mailto:wtaggart@vt.edu)
 
 Emotional Atlas is a desktop environment for examining emotional movement in literary texts and dream reports. It combines large language model (LLM) inference with locally validated textual evidence, a three-coordinate emotional representation, interactive visualization, geometric construction, and text-order evolution. A separate multilingual idiom workflow proposes direct expressions, transformed expressions, and tentative imagery echoes. An emotional shape-transfer workspace uses the trajectory of a source analysis to guide revision of another text. The system supports conservative editing and a more permissive transformation policy, reports its decisions, and preserves resumable checkpoints. This report describes the implemented algorithms, data flow, operational constraints, and verification of version 0.9.10. The scores and interpretations are model judgments, not established psychometric measurements; software verification does not establish interpretive accuracy or transfer efficacy.
 
-## Application interface
-
-![Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence.](acm/figures/screenshot-01.png)
-
-*Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence.*
-
-![Solid-object window showing the outermost-point surface, labeled emotional axes, mathematical description, and export controls for the saved analysis.](acm/figures/screenshot-02.png)
-
-*Solid-object window showing the outermost-point surface, labeled emotional axes, mathematical description, and export controls for the saved analysis.*
-
-![PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits.](acm/figures/screenshot-03.png)
-
-*PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits.*
-
 ## 1. Scope and design
 
 The application supports exploratory reading and computational experimentation. Its central unit is a text segment: ordinarily a paragraph, optionally a line, or a sentence when granular analysis is enabled. The interface preserves a distinction between source text, inferred emotional descriptions, derived coordinates, and geometric representations. Changing a surface or viewing mode does not change the underlying scores.
@@ -97,11 +83,17 @@ Valid results are retained when a neighboring segment fails. Failed evidence may
 
 Sentence analysis is opt-in. The local heuristic recognizes common English, Arabic, and Chinese terminal punctuation, selected abbreviations, decimal patterns, and closing punctuation. It is not a trained multilingual sentence parser. Dialogue, unusual abbreviations, poetry, and punctuation-free text can be segmented imperfectly. Changing analysis granularity starts a separate analysis; saved metadata identifies the segmentation mode even where legacy fields retain names such as `paragraphs`.
 
-
 ## 4. Emotional geometry and PCA
 
 The primary plot embeds a segment as:
 
+![PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits.](acm/figures/screenshot-03.png)
+
+*PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits.*
+
+![Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence.](acm/figures/screenshot-01.png)
+
+*Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence.*
 $$p_i=(V_i,D_i,2I_i-1)\in[-1,1]^3.$$
 
 This puts all three display axes on the same numeric range. The equal scaling is a modeling convention, not an empirically established equality of emotional distances. Color represents valence unless an idiom annotation activates a yellow marker.
@@ -116,6 +108,9 @@ The evolving-object view fits PCA once to its full snapshot and retains the same
 
 Three constructions are implemented:
 
+![Solid-object window showing the outermost-point surface, labeled emotional axes, mathematical description, and export controls for the saved analysis.](acm/figures/screenshot-02.png)
+
+*Solid-object window showing the outermost-point surface, labeled emotional axes, mathematical description, and export controls for the saved analysis.*
 1. **Outermost points:** the convex hull of unique eligible points. It encloses the sample but fills gaps and concavities.
 2. **Spatial neighbors:** a 3D Delaunay tetrahedralization filtered by a maximum-edge-length threshold. Exterior faces of retained tetrahedra form the surface. This is a specific thresholded tetrahedral construction, not a general claim to recover the text's intrinsic topology. It may produce disconnected components, cavities or nonmanifold contacts.
 3. **Text-order tube:** polygonal rings swept along consecutive emotional positions, with caps on connected runs. Missing coordinates break the path. Thickness is user-controlled, and crossings or tight bends can self-intersect; tube volume is not claimed.
@@ -133,7 +128,6 @@ with zero used for a one-unit text. Cumulative evolution includes eligible point
 $$W=\bigcup_{i=1}^{N-1}S_i\times[\tau_i,\tau_{i+1}),$$
 
 plus the final slice at the endpoint. This is text-order evolution, not elapsed reading time or a projected 4D convex hull. Topology can change between slices, and unmatched vertices are not interpolated.
-
 
 ## 6. Multilingual idioms and dream imagery
 
@@ -178,7 +172,6 @@ There is no fixed document-length or unit-count cap in transfer preparation. Ove
 A normal one-attempt batch uses approximately five model calls before correction, retries or failure isolation; two attempts add another rewrite/review/scoring cycle. Long documents can require substantial time and API usage. Completed-response usage counters can undercount requests whose responses were interrupted or rejected before accounting was returned.
 
 Passage-specific failures trigger bounded batch isolation. Persistently failing passages are flagged, retaining the original or an accepted earlier revision, and later passages continue automatically. Final-scoring failures preserve the revision but leave its earlier score provisional. Report records distinguish these failures from completed verification. Provider/transport failures and explicit cancellation still stop processing.
-
 
 ## 8. Persistence and exports
 

@@ -8,6 +8,20 @@
 \DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,fontsize=\small}
 \providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \usepackage{graphicx,float}
+
+% Permit figures to share pages with surrounding explanatory text.
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.80}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{3}
+\setcounter{totalnumber}{5}
+\setlength{\textfloatsep}{12pt plus 2pt minus 3pt}
+\setlength{\intextsep}{12pt plus 2pt minus 3pt}
+\raggedbottom
+
+\geometry{top=0.75in,bottom=0.65in,includeheadfoot}
 \begin{document}
 \title{Emotional Atlas: Emotional Geometry, Textual Evolution, and Shape-Guided Revision}
 \author{William Taggart}
@@ -57,29 +71,6 @@ emotional meaning has a unique geometric form, that a dream image has a
 determinate symbolic meaning, or that generated revisions preserve facts
 in flexible mode.
 
-\section{Application interface}
-The application exposes its principal operations through the following workspaces and controls.
-\begin{figure}[H]
-\centering
-\includegraphics[width=\linewidth,height=0.70\textheight,keepaspectratio]{figures/screenshot-01.png}
-\caption{Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence.}
-\Description{Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence.}
-\label{fig:app-screen-1}
-\end{figure}
-\begin{figure}[H]
-\centering
-\includegraphics[width=\linewidth,height=0.70\textheight,keepaspectratio]{figures/screenshot-02.png}
-\caption{Solid-object window showing the outermost-point surface, labeled emotional axes, mathematical description, and export controls for the saved analysis.}
-\Description{Solid-object window showing the outermost-point surface, labeled emotional axes, mathematical description, and export controls for the saved analysis.}
-\label{fig:app-screen-2}
-\end{figure}
-\begin{figure}[H]
-\centering
-\includegraphics[width=\linewidth,height=0.70\textheight,keepaspectratio]{figures/screenshot-03.png}
-\caption{PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits.}
-\Description{PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits.}
-\label{fig:app-screen-3}
-\end{figure}
 
 \section{Architecture and execution}\label{architecture-and-execution}
 
@@ -89,7 +80,7 @@ export operations also use background work where implemented. Local
 plotting, playback, PCA, and saved-result inspection do not require new
 model requests.
 
-\begin{figure}[htbp]
+\begin{figure}[!htb]
 \centering
 \begin{tikzpicture}[node distance=7mm and 7mm,
  box/.style={draw,rounded corners,align=center,font=\small,text width=33mm,inner sep=4pt},
@@ -161,7 +152,7 @@ application does not silently substitute another model. Transfer uses
 the source analysis's provider/model to reduce one source of scoring
 inconsistency.
 
-\begin{figure}[htbp]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{figures/illustration-01.pdf}
 \caption{Analysis pipeline. Model judgments are locally validated against source evidence before eligible segments enter geometry; validation is not evidence of psychometric accuracy.}
@@ -229,9 +220,24 @@ identifies the segmentation mode even where legacy fields retain names
 such as \nolinkurl{paragraphs}.
 
 
-
 \section{Emotional geometry and PCA}\label{emotional-geometry-and-pca}
 
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\linewidth,height=0.58\textheight,keepaspectratio]{figures/screenshot-01.png}
+\caption{Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence.}
+\Description{Saved analysis of The Call of Cthulhu, with 89 plotted paragraphs and 26 analyzed paragraphs lacking plot coordinates. Point colors encode valence.}
+\label{fig:app-screen-1}
+\end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\linewidth,height=0.58\textheight,keepaspectratio]{figures/screenshot-03.png}
+\caption{PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits.}
+\Description{PCA details from the saved analysis: component variation, weights, standardization statistics, and interpretation limits.}
+\label{fig:app-screen-3}
+\end{figure}
 The primary plot embeds a segment as:
 
 \[p_i=(V_i,D_i,2I_i-1)\in[-1,1]^3.\]
@@ -265,6 +271,14 @@ step.
 \section{Solid objects, curved surfaces and
 evolution}\label{solid-objects-curved-surfaces-and-evolution}
 
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\linewidth,height=0.58\textheight,keepaspectratio]{figures/screenshot-02.png}
+\caption{Solid-object window showing the outermost-point surface, labeled emotional axes, mathematical description, and export controls for the saved analysis.}
+\Description{Solid-object window showing the outermost-point surface, labeled emotional axes, mathematical description, and export controls for the saved analysis.}
+\label{fig:app-screen-2}
+\end{figure}
 Three constructions are implemented:
 
 \begin{enumerate}
@@ -317,7 +331,6 @@ elapsed reading time or a projected 4D convex hull. Topology can change
 between slices, and unmatched vertices are not interpolated.
 
 
-
 \section{Multilingual idioms and dream
 imagery}\label{multilingual-idioms-and-dream-imagery}
 
@@ -346,7 +359,7 @@ mental state. ChengyuBench is identified in project documentation as a
 potential evaluation resource; it is not bundled or used to establish
 the system's accuracy.
 
-\begin{figure}[htbp]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{figures/illustration-04.pdf}
 \caption{Idiom workflow. A literal image alone is not proof of an idiom; retrieved expressions and quoted evidence support hypotheses with alternative readings.}
@@ -435,7 +448,6 @@ Final-scoring failures preserve the revision but leave its earlier score
 provisional. Report records distinguish these failures from completed
 verification. Provider/transport failures and explicit cancellation
 still stop processing.
-
 
 
 \section{Persistence and exports}\label{persistence-and-exports}
